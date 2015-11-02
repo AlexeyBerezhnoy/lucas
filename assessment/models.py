@@ -15,10 +15,6 @@ class Person(models.Model):
         abstract = True
 
 
-class Driver(Person):
-    pass
-
-
 class Expert(Person):
     profession = models.CharField(max_length=30)
     position = models.CharField(max_length=30)
@@ -39,5 +35,4 @@ class Quality(models.Model):
 class Assessment(models.Model):
     quality = models.ForeignKey('Quality')
     expert = models.ForeignKey('Expert')
-    driver = models.ForeignKey('Driver')
     point = models.IntegerField()
