@@ -31,17 +31,13 @@ class Expert(Person):
 class Quality(models.Model):
     quality = models.CharField(max_length=30)
     description = models.TextField()
-    point = models.IntegerField()
 
     def __str__(self):
         return self.quality
 
 
-#Здесь возникает ошибка
 class Assessment(models.Model):
+    quality = models.ForeignKey('Quality')
     expert = models.ForeignKey('Expert')
     driver = models.ForeignKey('Driver')
-    quality = models.ManyToManyField('Quality')
-
-
-
+    point = models.IntegerField()
