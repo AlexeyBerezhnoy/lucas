@@ -1,7 +1,6 @@
 from django.db import models
 
-CATEGORIES = ['A', 'A1', 'B', 'B1', 'BE', 'C', 'C1', 'CE',
-              'C1E', 'D', 'D1', 'DE', 'D1E', 'M', 'Tm', 'Tb']
+CATEGORIES = ['A', 'A1', 'B', 'B1', 'BE', 'C', 'C1', 'CE', 'C1E', 'D', 'D1', 'DE', 'D1E', 'M', 'Tm', 'Tb']
 
 
 class Person(models.Model):
@@ -10,23 +9,23 @@ class Person(models.Model):
     patronymic = models.CharField(max_length=30)
 
     def __str__(self):
-        return "%s %s.%s", % (self.last_name,
-                              self.first_name[1],
-                              self.patronymic[1])
+        return self.last_name
 
     class Meta:
         abstract = True
 
 
-# Этот класс ещё нужно доделать после обсуждения с зказчиком
+class Driver(Person):
+    pass
+
+
 class Expert(Person):
     profession = models.CharField(max_length=30)
     position = models.CharField(max_length=30)
-    professional_experience = models.DurationField()
+    professional_experience = models.IntegerField()
     driver_license = models.CharField(max_length=30,
-                                      choises=((x, x) for x in CATEGORIES)
                                       blank=True)
-    driving_experience = models.DurationField()
+    driving_experience = models.IntegerField()
 
 
 class Quality(models.Model):
@@ -38,10 +37,11 @@ class Quality(models.Model):
         return self.quality
 
 
+#Здесь возникает ошибка
 class Assessment(models.Model):
-    expert = models.ForeinKey('Expert')
+    expert = models.ForeignKey('Expert')
+    driver = models.ForeignKey('Driver')
     quality = models.ManyToManyField('Quality')
 
 
-class Driver(Person):
-    assessment = models.ManyToManyField('Assessment')
+
