@@ -28,6 +28,14 @@ class Quality(models.Model):
     quality = models.CharField(max_length=30)
     description = models.TextField()
 
+    def get_assessment(self):
+        result = 0
+        if self.assessment_set.all():
+            for assessment in self.assessment_set.all():
+                result += assessment.point
+            result /= len(self.assessment_set.all())
+        return result
+
     def __str__(self):
         return self.quality
 

@@ -1,0 +1,5 @@
+﻿<ul>
+{% for assessment in assessments %}
+    <li>{{ assessment.expert }} оценил {{ assessment.quality }} на {{ assessment.point }} баллов</li>
+{% endfor %}
+</ul>
