@@ -55,3 +55,15 @@ docs/_build/
 
 # PyBuilder
 target/
+
+# PyCharm
+.idea/
+
+# SQLite3 
+*.sqlite3
+
+# migrations
+
+*/migrations/
+
+
