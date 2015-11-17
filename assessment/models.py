@@ -1,7 +1,5 @@
 from django.db import models
 
-CATEGORIES = ['A', 'A1', 'B', 'B1', 'BE', 'C', 'C1', 'CE', 'C1E', 'D', 'D1', 'DE', 'D1E', 'M', 'Tm', 'Tb']
-
 
 class Person(models.Model):
     last_name = models.CharField(max_length=30)
@@ -9,24 +7,29 @@ class Person(models.Model):
     patronymic = models.CharField(max_length=30)
 
     def __str__(self):
-        return self.last_name
+        return "%s %s.%s." % (self.last_name, self.first_name[0], self.patronymic[0])
 
     class Meta:
         abstract = True
 
 
 class Expert(Person):
+    CATEGORIES = ['A', 'A1', 'B', 'B1', 'BE', 'C', 'C1', 'CE', 'C1E', 'D', 'D1', 'DE', 'D1E', 'M', 'Tm', 'Tb']
     profession = models.CharField(max_length=30)
     position = models.CharField(max_length=30)
     professional_experience = models.IntegerField()
     driver_license = models.CharField(max_length=30,
+                                      choices=((x, x) for x in CATEGORIES),
                                       blank=True)
-    driving_experience = models.IntegerField()
+    driving_experience = models.IntegerField(blank=True)
 
 
 class Quality(models.Model):
-    quality = models.CharField(max_length=30)
+    quality = models.CharField(max_length=60)
     description = models.TextField()
+
+    def get_assessment(self):
+        pass
 
     def __str__(self):
         return self.quality
