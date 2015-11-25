@@ -21,7 +21,7 @@ class Expert(Person):
     professional_experience = models.IntegerField()
     driver_license = models.CharField(max_length=30,
                                       blank=True,
-                                      choices=((cat, cat) for cat in CATEGORIES)),
+                                      choices=((cat, cat) for cat in CATEGORIES))
     driving_experience = models.IntegerField(blank=True)
 
 
