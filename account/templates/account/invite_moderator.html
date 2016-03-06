@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+
+{% block content%}
+    <form action="/account/invite_moderator/" method="post">
+        {% csrf_token %}
+        <label>email</label>
+        <input type="text" name="email">
+        <label>last name</label>
+        <input type="text" name="last_name">
+        <label>first name</label>
+        <input type="text" name="first_name">
+        <label>middle name</label>
+        <input type="text" name="middle_name">
+        <input type="submit" value="оценить">
+    </form>
+{% endblock %}
