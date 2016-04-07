@@ -80,7 +80,7 @@ def show_experts(request):
 def cabinet(request):
     user = request.user
     if user.is_authenticated():
-        return render(request, "account:cabinet", {"user": user})
+        return render(request, "account/cabinet.html", {"user": user})
 
 
 def my_login(request):
