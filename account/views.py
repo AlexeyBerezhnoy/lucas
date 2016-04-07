@@ -18,9 +18,9 @@ def is_moderator(func):
             return func(request, *args)
 
         if request.user.is_expert:
-            return HttpResponseRedirect("/assessments/")
+            return HttpResponseRedirect(reverse("account:cabinet"))
 
-        return HttpResponseRedirect("account:login")
+        return HttpResponseRedirect(reverse("account:login"))
     return view
 
 
@@ -33,9 +33,9 @@ def is_expert(func):
             return func(request, *args)
 
         if request.user.is_moderator:
-            return HttpResponseRedirect("account:cabinet")
+            return HttpResponseRedirect(reverse("account:cabinet"))
 
-        return HttpResponseRedirect("account:login")
+        return HttpResponseRedirect(reverse("account:login"))
     return view
 
 # TODO: дай вьювам нормальные имена
@@ -109,7 +109,7 @@ def my_login(request):
 def confirm(request, email, password):
     user = authenticate(email=email, password=password)
     if user.is_active:
-        return HttpResponseRedirect("/account/cabinet/")
+        return HttpResponseRedirect(reverse("account:cabinet"))
     else:
         user.is_active = True
         user.save()
