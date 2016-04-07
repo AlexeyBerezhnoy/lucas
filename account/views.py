@@ -81,6 +81,8 @@ def cabinet(request):
     user = request.user
     if user.is_authenticated():
         return render(request, "account/cabinet.html", {"user": user})
+    else:
+        return HttpResponseRedirect(reverse("account:login"))
 
 
 def my_login(request):
@@ -112,10 +114,3 @@ def confirm(request, email, password):
         user.is_active = True
         user.save()
         return HttpResponse("passive")
-
-
-def start(request):
-    if request.user.is_authenticated():
-        return HttpResponseRedirect(reverse("account:cabinet"))
-    else:
-        return HttpResponseRedirect(reverse("account:login"))

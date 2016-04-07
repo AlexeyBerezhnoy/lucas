@@ -3,8 +3,7 @@ from . import views
 
 
 urlpatterns = [
-    url(r'^$', views.start),
-    url(r'^index/$', views.start),
+    url(r'^$', views.cabinet),
     url(r'^confirm/(\w*@\w*\.\w*)/([1-9A-Z]{4})/$', views.confirm),
     url(r'^logout/$', views.my_login, name="logout"),
     url(r'^login/$', views.my_login, name="login"),
