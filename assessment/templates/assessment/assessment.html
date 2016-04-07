@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <p>{{ expert }}</p>
+    <form action="/assessment/{{ quality.id }}/" method="post">
+        {% csrf_token %}
+        <label>{{ quality }}</label>
+        <input type="text" value="{{ point }}" name="point">
+        <input type="submit" value="оценить">
+    </form>
+{% endblock %}

@@ -1,0 +1,47 @@
+{% extends "account/cabinet.html" %}
+
+{% block title %}Эксперты{% endblock %}
+
+{% block sidebar %}
+    <ul class="nav nav-sidebar">
+        <li>
+            <a href={% url "account:cabinet" %}>Профиль</a>
+        </li>
+    </ul>
+    <ul class="nav nav-sidebar">
+        <li class="active">
+            <a href=#>Експерты</a>
+        </li>
+{#        <li>#}
+{#            <a href={% url "account:qualities" %}>Качества</a>#}
+{#        </li>#}
+{#        <li>#}
+{#            <a href={% url "account:assessments" %}>Оценки</a>#}
+{#        </li>#}
+    </ul>
+{% endblock %}
+{% block main %}
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Имя</th>
+                    <th>email</th>
+                    <th>Профессия</th>
+                    <th>Должность</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for expert in experts %}
+                    <tr>
+                        <td><a href={% url "account:expert" expert.id %}>{{ expert }}</a></td>
+                        <td>{{ expert.email }}</td>
+                        <td>{{ expert.profession }}</td>
+                        <td>{{ expert.position }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    <form action="{% url "account:invite_expert" %}">
+        <button class="button center-block">Пригласить</button>
+    </form>
+{% endblock %}

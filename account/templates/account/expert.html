@@ -1,0 +1,26 @@
+{% extends "account/experts.html" %}
+
+{% block title %}{{ expert }}{% endblock %}
+
+{% block main %}
+    <table class="table table-striped">
+        <tbody>
+        <tr>
+            <td>имя</td>
+            <td><a href={% url "account:expert" expert.id %}>{{ expert }}</a></td>
+        </tr>
+        <tr>
+            <td>почта</td>
+            <td>{{ expert.email }}</td>
+        </tr>
+        <tr>
+            <td>Профессия</td>
+            <td>{{ expert.profession }}</td>
+        </tr>
+        <tr>
+            <td>Должность</td>
+            <td>{{ expert.position }}</td>
+        </tr>
+        </tbody>
+    </table>
+{% endblock %}

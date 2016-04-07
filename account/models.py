@@ -6,7 +6,7 @@ CATEGORIES = ['A', 'A1', 'B', 'B1', 'BE', 'C', 'C1', 'CE', 'C1E', 'D', 'D1', 'DE
 
 
 class MyUserManager(BaseUserManager):
-
+    # TODO возможно отправку сообщений нужно скинуть в представления, но хз
     def invite(self, email):
         user = self.get(email=email)
         password = self.make_random_password(length=4, allowed_chars='ABCDEFGHJKLMNPQRSTUVWXYZ23456789')
@@ -27,6 +27,7 @@ class MyUserManager(BaseUserManager):
                           last_name=last_name,
                           first_name=first_name,
                           middle_name=middle_name)
+        user.is_moderator = True
         user.save()
         self.invite(email)
         return user
@@ -34,12 +35,13 @@ class MyUserManager(BaseUserManager):
     def create_expert(self, email, last_name, first_name, middle_name,
                       profession, professional_experience, position,
                       driver_license, driving_experience):
-
+        print("hii")
         user = self.model(email=email, last_name=last_name, first_name=first_name, middle_name=middle_name,
                           profession=profession, professional_experience=professional_experience, position=position,
                           driver_license=driver_license, driving_experience=driving_experience)
-        self.invite(email)
+        user.is_expert = True
         user.save()
+        self.invite(email)
 
     def create_superuser(self, email, password):
         user = self.model(email=self.normalize_email(email))
@@ -62,6 +64,9 @@ class MyUser(AbstractBaseUser, PermissionsMixin):
                                       blank=True,
                                       choices=((cat, cat) for cat in CATEGORIES))
     driving_experience = models.IntegerField(null=True)
+
+    is_expert = models.BooleanField(default=False)
+    is_moderator = models.BooleanField(default=False)
 
     is_active = models.BooleanField(default=False)
     is_admin = models.BooleanField(default=False)
@@ -104,9 +109,16 @@ class Expert(MyUser):
     objects = MyUserManager()
 
     def save(self, *args, **kwargs):
+        """
+        Запрещает сохранять экспертом поле
+        водительский стаж без наличия прав
+        """
         if not self.driver_license:
             self.driving_experience = False
         super(Expert, self).save(*args, **kwargs)
+
+    def __str__(self):
+        return "%s %s. %s." % (self.last_name, self.first_name[0], self.middle_name[0])
 
     class Meta:
         proxy = True

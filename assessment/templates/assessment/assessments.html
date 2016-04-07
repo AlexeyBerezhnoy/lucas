@@ -1,10 +1,26 @@
-﻿{% extends "base.html" %}
+﻿{% extends "account/cabinet.html" %}
 
-{% block content%}
-<ul>
-{% for assessment in assessments %}
-    <li>{{ assessment.expert }} оценил {{ assessment.quality }} на {{ assessment.point }} баллов</li>
-{% endfor %}
-</ul>
+{% block title %}Оценки{% endblock %}
 
+{% block sidebar %}
+    <ul class="nav nav-sidebar">
+        <li>
+            <a href={% url "account:cabinet" %}>Профиль</a>
+        </li>
+    </ul>
+    <ul class="nav nav-sidebar">
+        <li class="active">
+            <a href=#>Оценки</a>
+        </li>
+    </ul>
+{% endblock %}
+
+{% block main %}
+    <table class="table table-striped">
+    {% for quality in qualities %}
+        <tr>
+            <td><a href="/assessment/{{ quality.id }}/">{{ quality }}</a></td>
+        </tr>
+    {% endfor %}
+    </table>
 {% endblock %}

@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+
+{% block title %}
+    Войти
+{% endblock %}
+
+{% block loadstatic %}
+    {% load staticfiles %}
+    <link href="{% static 'account/css/style.css' %}" rel="stylesheet">
+{% endblock %}
+
+{% block content%}
+{#TODO: Сделать нормальное позиционрование для ошибки (alert-signin)#}
+    {% if error_message %}
+        <div class="alert alert-danger alert-signin">
+            {{ error_message }}
+        </div>
+    {% endif %}
+        <div class="panel panel-default panel-signin">
+            <div class="panel-heading head-signin">Войдите в свой аккаунт</div>
+            <div class="panel-body">
+                <form class="form-signin" action="{% url 'account:login' %}" method="post">
+                    {% csrf_token %}
+                    {#TODO: Включить csrf #}
+                    {{ form }}
+                    <button class="btn btn-lg btn-primary btn-block btn-signin" type="submit">Войти</button>
+                </form>
+            </div>
+        </div>
+{% endblock %}

@@ -1,0 +1,80 @@
+.alert-signin{
+    max-width: 600px;
+    margin: 10px auto;
+    position: absolute;
+    left:0;
+    right:0;
+    text-align: center;
+}
+
+.panel-signin{
+    max-width: 350px;
+    min-width: 200px;
+    margin: 80px auto 0;
+}
+
+.head-signin{
+    text-align: center;
+    font-size: 22px;
+    padding: 7px;
+}
+
+.btn-signin {
+    padding: 5px;
+}
+
+.field-signin {
+    margin-bottom: 20px;
+}
+
+.sidebar {
+    position: fixed;
+    top: 51px;
+    bottom: 0;
+    left: 0;
+    z-index: 1000;
+    display: block;
+    padding: 20px;
+    overflow-x: hidden;
+    overflow-y: auto;
+    background-color: #f5f5f5;
+    border-right: 1px solid #eee;
+}
+
+.main {
+    display: inline-block;
+    width: auto;
+    padding: 20px 40px;
+}
+
+.nav-sidebar {
+    margin-right: -21px;
+    margin-bottom: 20px;
+    margin-left: -20px;
+    font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
+    font-size: 14px;
+}
+
+.nav-sidebar > li > a {
+    padding-right: 20px;
+    padding-left: 20px;
+}
+
+.nav-sidebar > .active > a {
+    color: #fff;
+    background-color: #428bca;
+}
+
+.nav-sidebar > .active > a:hover {
+    background-color: #428bca;
+}
+
+.nav-sidebar > .active > a:visited {
+    background-color: #428bca;
+}
+
+p{
+    /*font-size: 21px;*/
+    font-weight: 200;
+    color: inherit;
+}

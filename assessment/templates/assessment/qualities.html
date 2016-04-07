@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+
+{% block content%}
+    <div class="container">
+    <div class="container">
+    <table class="table table-striped">
+        {% for quality in qualities %}
+            <tr>
+                <td><a href="/quality/{{ quality.id }}/">{{ quality.quality }}</a></td>
+{#                <td>{{ quality.description }}</td>#}
+                <td>{{ quality.get_assessment }}</td>
+            </tr>
+        {% endfor %}
+    </table>
+    </div>
+    </div>
+    <form action="/quality/">
+        <button class="button center-block">Добавить</button>
+    </form>
+{% endblock %}

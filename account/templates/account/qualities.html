@@ -1,0 +1,34 @@
+{% extends "account/cabinet.html" %}
+
+{% block title %}Качества{% endblock %}
+
+{% block sidebar %}
+    <ul class="nav nav-sidebar">
+        <li>
+            <a href={% url "account:cabinet" %}>Профиль</a>
+        </li>
+    </ul>
+    <ul class="nav nav-sidebar">
+        <li>
+            <a href={% url "account:experts" %}>Експерты</a>
+        </li>
+        <li class="active">
+            <a href=#>Качества</a>
+        </li>
+        <li>
+            <a href={% url "account:assessments" %}>Оценки</a>
+        </li>
+    </ul>
+{% endblock %}
+{% block main %}
+        <table class="table table-striped">
+            {% for quality in qualities %}
+                <tr>
+                    <td><a href="/quality/{{ quality.id }}/">{{ quality }}</a></td>
+                </tr>
+            {% endfor %}
+        </table>
+    <form action="#">
+        <button class="button center-block">добавить</button>
+    </form>
+{% endblock %}
