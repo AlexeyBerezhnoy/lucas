@@ -7,35 +7,42 @@
     <link href="{% static 'account/css/style.css' %}" rel="stylesheet">
 {% endblock %}
 
-{% block content%}
+{% block content %}
     <div class="row">
-        <div class="col-lg-2 col-sm-2  col-md-2 sidebar">
-{#         TODO: возможно это нужно генерировать процедурно#}
-        {% block sidebar %}
-            <ul class="nav nav-sidebar">
-                <li class="active">
-                    <a class="info" href=#>Профиль</a>
-                </li>
-            </ul>
-            <ul class="nav nav-sidebar">
-                    <li>
-                        <a href={% url "account:experts" %}>Експерты</a>
-                    </li>
+            <div class="col-lg-2 col-sm-2  col-md-2 sidebar">
+{#            {% for items_set in request.menu_items %}#}
+{#                <ul class="nav nav-sidebar">#}
+{#                {% for item in items_set %}#}
+                    {# TODO: выделить текущую страницу #}
+                    {#<li class="active">#}
 {#                    <li>#}
-{#                        <a href={% url "account:qualities" %}>Качества</a>#}
+{#                        <a class="info" href={% url item|last %}>{{ item|first }}</a>#}
 {#                    </li>#}
-{#                    <li>#}
-{#                        <a href={% url "account:assessments" %}>Оценки</a>#}
-{#                    </li>#}
-            </ul>
-        {%endblock %}
-        </div>
-{#         Todo: поправь разметку колонок #}
+{#                {% endfor %}#}
+{#                </ul>#}
+{#            {% endfor %}#}
+                {% block sidebar %}
+                    <ul class="nav nav-sidebar">
+                        <li class="active">
+                            <a class="info" href={% url "account:cabinet" %}>Профиль</a>
+                        </li>
+                    </ul>
+                    <ul class="nav nav-sidebar">
+                        <li>
+                            <a href={% url "account:experts" %}>Експерты</a>
+                        </li>
+                        <li>
+                            <a href={% url "account:cabinet" %}>Качества</a>
+                        </li>
+                        <li>
+                            <a href={% url "account:cabinet" %}>Оценки</a>
+                        </li>
+                    </ul>
+                {% endblock %}
+            </div>
+        {#         Todo: поправь разметку колонок #}
         <div class="col-lg-offset-2 col-md-offset-2 col-sm-offset-2  main">
             {% block main %}
-                <p>
-                Здравствуйте {{ user.first_name }} {{ user.middle_name }} {{ user.last_name }}
-                </p>
             {% endblock %}
         </div>
     </div>

@@ -6,7 +6,22 @@ from django.shortcuts import render
 from assessment.models import Expert
 from account.forms import NoError, LoginForm, InviteForm
 
-#TODO: избавься от хардкода
+
+# TODO: избавься от хардкода
+
+# def add_menu_items(func):
+#     def view(request, *args):
+#         if request.user.is_moderator:
+#             request.menu_items = [[["Профиль", "account:cabinet"]],
+#                                   [["Експерты", "account:experts"],
+#                                    ["Качества", "account:cabinet"],
+#                                    ["Оценки", "account:cabinet"]]]
+#         if request.user.is_expert:
+#             request.menu_items = [[["Профиль", "account:cabinet"]],
+#                                   [["Оценки", "account:cabinet"]]]
+#         return func(request, *args)
+#
+#     return view
 
 
 def is_moderator(func):
@@ -21,6 +36,7 @@ def is_moderator(func):
             return HttpResponseRedirect(reverse("account:cabinet"))
 
         return HttpResponseRedirect(reverse("account:login"))
+
     return view
 
 
@@ -36,7 +52,9 @@ def is_expert(func):
             return HttpResponseRedirect(reverse("account:cabinet"))
 
         return HttpResponseRedirect(reverse("account:login"))
+
     return view
+
 
 # TODO: дай вьювам нормальные имена
 
@@ -46,7 +64,7 @@ def invite_expert(request):
         form = InviteForm(request.POST, error_class=NoError)
         if form.is_valid():
             try:
-                #TODO с этим нужно что-то сделать, возможно переопределить конструктор класса Expert
+                # TODO с этим нужно что-то сделать, возможно переопределить конструктор класса Expert
                 Expert.objects.create_expert(email=request.POST["email"],
                                              last_name=request.POST["last_name"],
                                              first_name=request.POST["first_name"],
@@ -81,8 +99,8 @@ def cabinet(request):
     user = request.user
     if user.is_authenticated():
         return render(request, "account/cabinet.html", {"user": user})
-    else:
-        return HttpResponseRedirect(reverse("account:login"))
+
+    return HttpResponseRedirect(reverse("account:login"))
 
 
 def my_login(request):
