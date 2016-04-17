@@ -1,0 +1,8 @@
+{% extends "account/base/cabinet.html" %}
+{% block main %}
+    {% if user.is_staff %}
+        {% include "account/profile/_moderator_profile.html" %}
+    {% else %}
+        {% include "account/profile/_expert_profile.html" %}
+    {% endif %}
+{% endblock %}

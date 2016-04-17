@@ -23,20 +23,18 @@
 {#            {% endfor %}#}
                 {% block sidebar %}
                     <ul class="nav nav-sidebar">
-                        <li class="active">
+                    {# TODO: Сделать выделение активного пункта меня #}
+{#                        <li class="active">#}
+                        <li>
                             <a class="info" href={% url "account:cabinet" %}>Профиль</a>
                         </li>
                     </ul>
                     <ul class="nav nav-sidebar">
-                        <li>
-                            <a href={% url "account:experts" %}>Експерты</a>
-                        </li>
-                        <li>
-                            <a href={% url "account:cabinet" %}>Качества</a>
-                        </li>
-                        <li>
-                            <a href={% url "account:cabinet" %}>Оценки</a>
-                        </li>
+                        {% if user.is_staff %}
+                            {% include "account/base/_moderator_menu.html" %}
+                        {% else %}
+                            {% include "account/base/_expert_menu.html" %}
+                        {% endif %}
                     </ul>
                 {% endblock %}
             </div>

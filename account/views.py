@@ -4,10 +4,8 @@ from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect, HttpResponse
 from django.shortcuts import render
 from assessment.models import Expert
-from account.forms import NoError, LoginForm, InviteForm
+from account.forms import NoError, LoginForm, InviteForm, ModeratorForm
 
-
-# TODO: избавься от хардкода
 
 # def add_menu_items(func):
 #     def view(request, *args):
@@ -24,41 +22,41 @@ from account.forms import NoError, LoginForm, InviteForm
 #     return view
 
 
-def is_moderator(func):
-    def view(request, *args):
-        if not request.user.is_authenticated():
-            return HttpResponseRedirect(reverse("account:login"))
+def is_auth(func):
+    def view(request):
+        if request.user.is_authenticated():
+            return func(request)
+        return HttpResponseRedirect(reverse("account:login"))
+    return view
 
-        if request.user.is_moderator:
+
+def is_moderator(func):
+    @is_auth
+    def view(request, *args):
+        # Todo: убери is_admin
+        if request.user.is_moderator or request.user.is_admin:
             return func(request, *args)
 
         if request.user.is_expert:
             return HttpResponseRedirect(reverse("account:cabinet"))
-
-        return HttpResponseRedirect(reverse("account:login"))
-
     return view
 
 
 def is_expert(func):
+    @is_auth
     def view(request, *args):
-        if not request.user.is_authenticated():
-            return HttpResponseRedirect(reverse("account:login"))
-
         if request.user.is_expert:
             return func(request, *args)
 
         if request.user.is_moderator:
             return HttpResponseRedirect(reverse("account:cabinet"))
-
-        return HttpResponseRedirect(reverse("account:login"))
 
     return view
 
 
 # TODO: дай вьювам нормальные имена
 
-
+@is_moderator
 def invite_expert(request):
     if request.method == "POST":
         form = InviteForm(request.POST, error_class=NoError)
@@ -80,27 +78,28 @@ def invite_expert(request):
 
     else:
         form = InviteForm
-    return render(request, "account/invite_expert.html", {"form": form})
+    return render(request, "account/experts/new_expert.html", {"form": form})
 
 
 @is_moderator
 def show_expert(request, *args):
     expert = Expert.objects.get(id=args[0])
-    return render(request, "account/expert.html", {"expert": expert})
+    return render(request, "account/experts/show_expert.html", {"expert": expert})
 
 
 @is_moderator
 def show_experts(request):
     experts = Expert.objects.filter(is_expert=True)
-    return render(request, "account/experts.html", {"experts": experts})
+    return render(request, "account/experts/experts.html", {"experts": experts})
 
 
+@is_auth
 def cabinet(request):
     user = request.user
-    if user.is_authenticated():
-        return render(request, "account/cabinet.html", {"user": user})
-
-    return HttpResponseRedirect(reverse("account:login"))
+    # if user.is_moderator:
+    form = ModeratorForm()
+    return render(request, "account/profile/show_profile.html", {"user": user,
+                                                    "form": form})
 
 
 def my_login(request):

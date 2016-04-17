@@ -1,7 +1,8 @@
+from django.forms import ModelForm
 from django.forms.utils import ErrorList
 from django import forms
 
-from account.models import CATEGORIES
+from account.models import CATEGORIES, Moderator
 
 
 # Todo: это ужасный костыль, убери его
@@ -29,3 +30,9 @@ class InviteForm(forms.Form):
     position = forms.CharField()
     driver_license = forms.ChoiceField(choices=((cat, cat) for cat in CATEGORIES))
     driving_experience = forms.CharField()
+
+
+class ModeratorForm(ModelForm):
+    class Meta:
+        model = Moderator
+        fields = ['email', 'last_name', 'first_name', 'middle_name']

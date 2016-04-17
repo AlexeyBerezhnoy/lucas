@@ -48,6 +48,7 @@ class MyUserManager(BaseUserManager):
         user.set_password(password)
         user.is_active = True
         user.is_admin = True
+        user.is_moderator = True
         user.save(using=self._db)
 
 
