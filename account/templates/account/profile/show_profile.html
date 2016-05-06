@@ -1,8 +1,27 @@
 {% extends "account/base/cabinet.html" %}
 {% block main %}
-    {% if user.is_staff %}
-        {% include "account/profile/_moderator_profile.html" %}
-    {% else %}
-        {% include "account/profile/_expert_profile.html" %}
-    {% endif %}
+    <h4>Мой профиль</h4>
+    <div class="container-fluid container-limited">
+    <div class="row">
+        <div class="col-lg-3 profile-settings-sidebar">
+            <p>Информация о пользователе</p>
+        </div>
+        <div class="col-lg-9">
+            <form action="{% url "account:edit_profile" %}" method="post">
+                {{ profile_form }}
+                <button type="submit" class="s-btn btn btn-md btn-success">Подтвердить изменения</button>
+            </form>
+        </div>
+    </div>
+    <hr>
+    <div class="row">
+        <div class="col-lg-3 profile-settings-sidebar">Изменить пароль</div>
+        <div class="col-lg-9">
+            <form action="{% url "account:change_password" %}" method="post">
+                {{ password_change_form }}
+                <button type="submit" class="s-btn btn btn-md btn-danger">Изменить пароль</button>
+            </form>
+        </div>
+    </div>
+    </div>
 {% endblock %}

@@ -1,0 +1,25 @@
+{% extends "account/base/cabinet.html" %}
+{% block main %}
+    <form action="{% url "account:edit_profile" %}" method="post">
+    <h4>Мой профиль</h4>
+    <table class="table">
+        <tr>
+            <td>E-mail</td>
+            <td>{{ form.email }}</td>
+        </tr>
+        <tr>
+            <td>Фамилия</td>
+            <td>{{ form.last_name }}</td>
+        </tr>
+        <tr>
+            <td>Имя</td>
+            <td>{{ form.first_name }}</td>
+        </tr>
+        <tr>
+            <td>Отчество</td>
+            <td>{{ form.middle_name }}</td>
+        </tr>
+    </table>
+    <button class="my-btn button center-block">Сохранить</button>
+    </form>
+{% endblock %}

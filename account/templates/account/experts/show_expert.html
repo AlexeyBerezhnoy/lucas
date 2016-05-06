@@ -3,24 +3,40 @@
 {% block title %}{{ expert }}{% endblock %}
 
 {% block main %}
-    <table class="table table-striped">
-        <tbody>
-        <tr>
-            <td>имя</td>
-            <td><a href={% url "account:expert" expert.id %}>{{ expert }}</a></td>
-        </tr>
-        <tr>
-            <td>почта</td>
-            <td>{{ expert.email }}</td>
-        </tr>
-        <tr>
-            <td>Профессия</td>
-            <td>{{ expert.profession }}</td>
-        </tr>
-        <tr>
-            <td>Должность</td>
-            <td>{{ expert.position }}</td>
-        </tr>
-        </tbody>
-    </table>
+    <div class="container-fluid container-limited">
+        <div class="row">
+            <div class="col-lg-3 profile-settings-sidebar">
+                <p>Информация о пользователе</p>
+            </div>
+            <div class="col-lg-9">
+                <form action="{% url "account:edit_expert" expert.id %}" method="post">
+                    {{ form }}
+                    <button type="submit" class="s-btn btn btn-md my-btn btn-success">Подтвердить изменения</button>
+                </form>
+            </div>
+        </div>
+        <hr>
+        <div class="row">
+            <div class="col-lg-3 profile-settings-sidebar">Изменить пароль</div>
+            <div class="col-lg-9">
+                <form action="{% url "account:reset_password" expert.email %}">
+                    <button type="submit" class="s-btn btn btn-md btn-danger">Сбросить пароль</button>
+                </form>
+            </div>
+        </div>
+        <hr>
+        <div class="row">
+            <div class="col-lg-3 profile-settings-sidebar">Управление аккаунтом</div>
+            <div class="col-lg-9">
+                <form class="inline-form" action="{% url "account:toggle_activity" expert.id %}">
+                    <button type="submit" class="btn btn-md btn-warning s-btn">
+                        {% if expert.is_active %}Заблокировать аккаунт{% else %}Разблокировать аккаунт{% endif %}
+                    </button>
+                </form>
+                <form class="inline-form" action="{% url "account:del_expert" expert.id %}">
+                    <button type="submit" class="btn btn-md btn-danger s-btn">Удалить аккаунт</button>
+                </form>
+            </div>
+        </div>
+    </div>
 {% endblock %}

@@ -4,3 +4,17 @@ body {
 .content {
     padding:10px 15px;
 }
+
+.right-block {
+    float: right;
+    margin-bottom: 10px;
+}
+
+.s-btn {
+    margin-top: 15px;
+    display: inline-block;
+}
+
+form label {
+    margin: 5px 0;
+}

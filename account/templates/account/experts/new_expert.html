@@ -3,8 +3,16 @@
 {% block title %}Эксперты{% endblock %}
 
 {% block main %}
-    <form action="{% url "account:invite_expert" %}" method="post">
-        {{ form.as_p }}
-        <button class="button center-block">Пригласить</button>
-    </form>
+    <div class="container-fluid container-limited">
+        <div class="row">
+        <div class="col-lg-3 profile-settings-sidebar">
+            <p>Информация о пользователе</p>
+        </div>
+        <div class="col-lg-9">
+            <form action="{% url "account:invite_expert" %}" method="post">
+                {{ form }}
+                <button type="submit" class="s-btn btn btn-md my-btn btn-success">Приласить</button>
+            </form>
+        </div>
+    </div>
 {% endblock %}

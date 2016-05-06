@@ -2,46 +2,50 @@
 
 {% block title %}Эксперты{% endblock %}
 
-{% block sidebar %}
-    <ul class="nav nav-sidebar">
-        <li>
-            <a href={% url "account:cabinet" %}>Профиль</a>
-        </li>
-    </ul>
-    <ul class="nav nav-sidebar">
-        <li class="active">
-            <a href=#>Експерты</a>
-        </li>
-        <li>
-            <a href={% url "account:cabinet" %}>Качества</a>
-        </li>
-        <li>
-            <a href={% url "account:cabinet" %}>Оценки</a>
-        </li>
-    </ul>
-{% endblock %}
+{#{% block sidebar %}#}
+{#    <ul class="nav nav-sidebar">#}
+{#        <li>#}
+{#            <a href={% url "account:cabinet" %}>Профиль</a>#}
+{#        </li>#}
+{#    </ul>#}
+{#    <ul class="nav nav-sidebar">#}
+{#        <li class="active">#}
+{#            <a href=#>Експерты</a>#}
+{#        </li>#}
+{#        <li>#}
+{#            <a href={% url "account:cabinet" %}>Качества</a>#}
+{#        </li>#}
+{#        <li>#}
+{#            <a href={% url "account:cabinet" %}>Оценки</a>#}
+{#        </li>#}
+{#    </ul>#}
+{#{% endblock %}#}
 {% block main %}
+        <form action="{% url "account:invite_expert" %}">
+            <button class="btn btn-md btn-success right-block">Пригласить</button>
+        </form>
         <table class="table table-striped">
             <thead>
                 <tr>
-                    <th>Имя</th>
+                    <th>id</th>
+                    <th>Фио</th>
                     <th>email</th>
-                    <th>Профессия</th>
+                    <th>Профессия (Стаж)</th>
                     <th>Должность</th>
+                    <th>Водительское уд. (Стаж)</th>
                 </tr>
             </thead>
             <tbody>
                 {% for expert in experts %}
-                    <tr>
-                        <td><a href={% url "account:expert" expert.id %}>{{ expert }}</a></td>
+                    <tr onclick="window.location.href='{% url "account:expert" expert.id %}'; return false">
+                        <td>{{ expert.id }}</td>
+                        <td>{{ expert }}</td>
                         <td>{{ expert.email }}</td>
-                        <td>{{ expert.profession }}</td>
+                        <td>{{ expert.profession }}({{ expert.professional_experience }})</td>
                         <td>{{ expert.position }}</td>
+                        <td>{{ expert.driver_license }}({{ expert.driving_experience }})</td>
                     </tr>
                 {% endfor %}
             </tbody>
         </table>
-    <form action="{% url "account:invite_expert" %}">
-        <button class="button center-block">Пригласить</button>
-    </form>
 {% endblock %}

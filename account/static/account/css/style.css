@@ -1,7 +1,6 @@
-.alert-signin{
+.alert{
     max-width: 600px;
     margin: 10px auto;
-    position: absolute;
     left:0;
     right:0;
     text-align: center;
@@ -10,7 +9,11 @@
 .panel-signin{
     max-width: 350px;
     min-width: 200px;
-    margin: 80px auto 0;
+    margin: 60px auto 0;
+}
+
+.panel-body{
+    /*padding-bottom: 5px;*/
 }
 
 .head-signin{
@@ -20,11 +23,17 @@
 }
 
 .btn-signin {
-    padding: 5px;
+    padding: 10px;
 }
 
 .field-signin {
     margin-bottom: 20px;
+}
+
+.password-reset-link{
+    text-align: center;
+    margin: 7px 7px -4px;
+    padding: 0;
 }
 
 .sidebar {
@@ -42,8 +51,8 @@
 }
 
 .main {
-    display: inline-block;
-    width: auto;
+    /*display: inline-block;*/
+    /*width: auto;*/
     padding: 20px 40px;
 }
 
@@ -73,8 +82,27 @@
     background-color: #428bca;
 }
 
-p{
+.messages{
+    list-style-type: none;
+    padding: 0;
+}
+
+.alert-error {
+    color: #a94442;
+    background-color: #f2dede;
+    border-color: #ebccd1;
+}
+
+p {
     /*font-size: 21px;*/
     font-weight: 200;
     color: inherit;
+}
+
+td {
+    vertical-align: middle;
+}
+
+.inline-form {
+    display: inline-block;
 }

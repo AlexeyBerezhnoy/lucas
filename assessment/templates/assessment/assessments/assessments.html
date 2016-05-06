@@ -1,0 +1,17 @@
+﻿{% extends "account/base/cabinet.html" %}
+
+{% block title %}Оценки{% endblock %}
+
+{% block main %}
+    <table class="table table-striped">
+    {% for assessment in assessments %}
+        <tr>
+            {% if user.is_moderator or user.is_admin %}
+                <td>Пользователь {{ assessment.expert }} оценил {{ assessment.quality }} в {{ assessment.point }} баллов</td>
+            {% elif uder.is_expert %}
+{#                <td><a href="/assessment/{{ quality.id }}/">{{ quality }}</a></td>#}
+            {% endif %}
+        </tr>
+    {% endfor %}
+    </table>
+{% endblock %}

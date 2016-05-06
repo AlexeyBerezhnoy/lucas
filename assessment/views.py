@@ -1,40 +1,47 @@
+from django.core.urlresolvers import reverse
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
+from account.views import is_moderator
+from assessment.forms import QualityForm
 from assessment.models import Quality, Assessment
 from account.models import Expert
 from django.core.exceptions import ObjectDoesNotExist
 
 
 def show_qualities(request):
-    if request.user.is_moderator:
-        qualities = Quality.objects.all()
-        return render(request, "assessment/qualities.html", {"qualities": qualities})
-    else:
-        return HttpResponse("вы не являетесь модератором")
+    qualities = Quality.objects.all()
+    return render(request, "assessment/qualities/qualities.html", {"qualities": qualities})
 
 
-def new_quality(request, quality_id=-1):
-    if request.user.is_moderator:
-        if request.method == "POST" and "quality" in request.POST:
-            q = Quality.objects.get(id=quality_id)
-            q.quality = request.POST["quality"]
-            q.description = request.POST["description"]
-            q.save()
-            return HttpResponseRedirect("/qualities/")
-        else:
-            if quality_id == -1:
-                q = Quality()
-                q.save()
-            else:
-                q = Quality.objects.get(id=quality_id)
-            return render(request, "assessment/quality.html", {"quality": q})
-    else:
-        return HttpResponse("вы не являетесь модератором")
+@is_moderator
+def new_quality(request):
+    q = Quality()
+    q.save()
+    return HttpResponseRedirect(reverse("assessment:quality", args=q.id))
+
+
+@is_moderator
+def edit_quality(request, id):
+    q = Quality.objects.get(id=id)
+    if request.method == "POST" and "quality" in request.POST:
+        q.quality = request.POST["quality"]
+        q.category = request.POST["category"]
+        q.description = request.POST["description"]
+        q.save()
+        return HttpResponseRedirect(reverse("assessment:qualities"))
+
+    form = QualityForm({"quality": q.quality,
+                        "category": q.category,
+                        "description": q.description})
+    return render(request, "assessment/qualities/quality.html", {"quality": q,
+                                                                 "form": form})
 
 
 def show_assessments(request):
+    if request.user.is_moderator or request.user.is_admin:
+        return render(request, 'assessment/assessments/assessments.html', {"assessments": Assessment.objects.all()})
     if request.user.is_expert:
-        return render(request, 'assessment/assessments.html', {"qualities": Quality.objects.all()})
+        return render(request, 'assessment/assessments/assessments.html', {"qualities": Quality.objects.all()})
     else:
         return HttpResponse("вы не являетесь экспертом")
 
@@ -60,31 +67,6 @@ def new_assessment(request, quality_id):
         a.save()
         return HttpResponseRedirect("/assessments/")
 
-    return render(request, "assessment/assessment.html", {"quality": quality,
-                                                          "point": point})
+    return render(request, "assessment/assessments/assessment.html", {"quality": quality,
+                                                                      "point": point})
 
-# Вытащил из account, хз зачем я их туда поместил
-# def assessments(request):
-#     if not request.user.is_authenticated():
-#         return HttpResponseRedirect(reverse("account:login"))
-#
-#     if request.user.is_moderator:
-#         return render(request, "account/assessments.html")
-#
-#     if request.user.is_expert:
-#         return HttpResponseRedirect(reverse("account:cabinet"))
-#
-#     return HttpResponseRedirect("account:login")
-
-# def qualities(request):
-#     if not request.user.is_authenticated():
-#         return HttpResponseRedirect(reverse("account:login"))
-#
-#     if request.user.is_moderator:
-#         q = Quality.objects.all()
-#         return render(request, "account/qualities.html", {"qualities": q})
-#
-#     if request.user.is_expert:
-#         return HttpResponseRedirect(reverse("account:cabinet"))
-#
-#     return HttpResponseRedirect("account:login")

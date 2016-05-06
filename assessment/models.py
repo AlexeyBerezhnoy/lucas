@@ -2,17 +2,31 @@ from django.db import models
 from account.models import Expert
 from assessment.validator import *
 
+QUALITY_CATEGORY = (("VS", "Свойства зрительного анализаторов"),
+                    ("HR", "Свойства слухового анализатора"),
+                    ("SM", "Свойства обонятельного анализатора"),
+                    ("TM", "Свойства температурного анализатора"),
+                    ("TC", "Свойства тактильного анализатора"),
+                    ("AT", "Свойства внимания"),
+                    ("MM", "Свойства памяти"),
+                    ("TN", "Свойства мышления"),
+                    ("RT", "Сенсомоторные реакции"),
+                    ("EM", "Свойства эмоционально-волевой и мотивационной сфер"))
+
 
 class Quality(models.Model):
     quality = models.CharField(max_length=60)
+    category = models.CharField(max_length=60,
+                                choices=QUALITY_CATEGORY)
     description = models.TextField()
 
     def __str__(self):
         return self.quality
 
-    # TODO: реализовать рассчёт коэффициента
-    def math_func(self):
-        assessments = self.assessment_set().all()  # Возвращает QuerySet c объектами Assessment
+    def get_category(self):
+        for category in QUALITY_CATEGORY:
+            if self.category == category[0]:
+                return category[1]
 
 
 class Assessment(models.Model):

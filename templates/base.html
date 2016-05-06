@@ -24,6 +24,9 @@
     </div>
 </nav>
 <div class="content">
+    {% block notice %}
+        {% include "account/base/notices.html" %}
+    {% endblock %}
     {% block content %}{% endblock %}
 </div>
 <!-- Bootstrap core JavaScript

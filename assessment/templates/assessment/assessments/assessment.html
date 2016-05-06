@@ -1,0 +1,13 @@
+{% extends "account/base/cabinet.html" %}
+
+{% block main %}
+    <form action="/assessment/{{ quality.id }}/" method="post">
+        {% csrf_token %}
+        <h3>{{ quality }}</h3>
+        <h4>{{ quality.get_category }}</h4>
+        <p><label>{{ quality.description }}</label></p>
+        <input type="text" class="form-control" value="{{ point }}" name="point">
+        <input type="submit" class="s-btn btn btn-md btn-success" value="оценить">
+    </form>
+
+{% endblock %}
