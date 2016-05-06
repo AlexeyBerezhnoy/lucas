@@ -1,6 +1,8 @@
+from django.contrib import messages
 from django.core.urlresolvers import reverse
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
+from account.forms import NoError
 from account.views import is_moderator
 from assessment.forms import QualityForm
 from assessment.models import Quality, Assessment
@@ -17,24 +19,43 @@ def show_qualities(request):
 def new_quality(request):
     q = Quality()
     q.save()
-    return HttpResponseRedirect(reverse("assessment:quality", args=q.id))
+    return edit_quality(request, q.id)
 
 
 @is_moderator
 def edit_quality(request, id):
     q = Quality.objects.get(id=id)
-    if request.method == "POST" and "quality" in request.POST:
-        q.quality = request.POST["quality"]
-        q.category = request.POST["category"]
-        q.description = request.POST["description"]
-        q.save()
-        return HttpResponseRedirect(reverse("assessment:qualities"))
-
+    if request.method == "POST":
+        form = QualityForm(request.POST, error_class=NoError)
+        if form.is_valid():
+            q.quality = request.POST["quality"]
+            q.category = request.POST["category"]
+            q.description = request.POST["description"]
+            q.save()
+            return HttpResponseRedirect(reverse("assessment:qualities"))
+        else:
+            messages.error(request, "Форма не валидна")
+            return render(request, "assessment/qualities/quality.html", {"quality": q,
+                                                                 "form": form})
     form = QualityForm({"quality": q.quality,
                         "category": q.category,
-                        "description": q.description})
+                        "description": q.description},
+                       error_class=NoError)
     return render(request, "assessment/qualities/quality.html", {"quality": q,
                                                                  "form": form})
+
+
+@is_moderator
+def del_quality(request, id):
+    try:
+        q = Quality.objects.get(id=id)
+        q.delete()
+        messages.success(request, "Качество удалено")
+        # Todo: Отлови нормальное исключение
+    except Exception:
+        messages.error(request, "Качество не найден")
+    return HttpResponseRedirect(reverse("assessment:qualities"))
+
 
 
 def show_assessments(request):
@@ -69,4 +90,3 @@ def new_assessment(request, quality_id):
 
     return render(request, "assessment/assessments/assessment.html", {"quality": quality,
                                                                       "point": point})
-
