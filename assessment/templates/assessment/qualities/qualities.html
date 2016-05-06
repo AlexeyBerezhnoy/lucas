@@ -11,9 +11,12 @@
         <th>Название</th>
         <th>Категория</th>
         <th>Описание</th>
+        {% if user.is_moderator %}
+            <th> Оценка </th>
+        {% endif %}
         <tbody>
         {% for quality in qualities %}
-            {% if user.is_moderator or user.is_admin %}
+            {% if user.is_moderator %}
                 <tr onclick="window.location.href='{% url "assessment:edit_quality" quality.id %}'; return false">
                     {% elif user.is_expert %}
                 <tr onclick="window.location.href='/assessment/{{ quality.id }}/'; return false">
@@ -21,6 +24,9 @@
         <td>{{ quality.quality }}</td>
         <td>{{ quality.get_category }}</td>
         <td>{{ quality.description|truncatechars:80 }}</td>
+        {% if user.is_moderator %}
+            <td> {{ quality.average_assessment }} </td>
+        {% endif %}
         </tr>
         {% endfor %}
         </tbody>

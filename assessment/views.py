@@ -57,7 +57,6 @@ def del_quality(request, id):
     return HttpResponseRedirect(reverse("assessment:qualities"))
 
 
-
 def show_assessments(request):
     if request.user.is_moderator or request.user.is_admin:
         return render(request, 'assessment/assessments/assessments.html', {"assessments": Assessment.objects.all()})
