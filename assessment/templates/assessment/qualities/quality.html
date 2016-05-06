@@ -13,7 +13,7 @@
     {{ form }}
     <button type="submit" class="s-btn btn btn-md btn-success">Сохранить</button>
     </form>
-    <form>
-        <button type="button" class="s-btn btn btn-md btn-danger">Удалить</button>
+    <form action="{% url "assessment:del_quality" quality.id %}">
+        <button type="submit" class="s-btn btn btn-md btn-danger">Удалить</button>
     </form>
 {% endblock %}
