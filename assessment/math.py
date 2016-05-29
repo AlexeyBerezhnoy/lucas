@@ -1,8 +1,6 @@
 import scipy
 import scipy.stats
-from openpyxl import Workbook
-from openpyxl import load_workbook
-import xlrd as xlrd
+import xlrd
 
 
 def math_func(table):

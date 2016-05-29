@@ -5,7 +5,7 @@ from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect, HttpResponse
 from django.shortcuts import render
 from django.template.loader import render_to_string
-from account.models import Moderator, MyUser
+from account.models import MyUser
 from assessment.models import Expert
 from account.forms import NoError, LoginForm, ExpertForm, ModeratorForm, PasswordChangeForm
 from django.contrib import messages
@@ -89,7 +89,6 @@ def edit_profile(request):
                 profile.middle_name = request.POST["middle_name"]
                 profile.save()
                 messages.success(request, 'Информация не валидна.')
-                return HttpResponseRedirect(reverse("account:cabinet"))
             else:
                 messages.error(request, 'Форма не валидна')
         elif user.is_expert:
@@ -101,7 +100,6 @@ def edit_profile(request):
                 profile.middle_name = request.POST["middle_name"]
                 profile.save()
                 messages.success(request, 'Информация не валидна.')
-                return HttpResponseRedirect(reverse("account:cabinet"))
             else:
                 messages.error(request, 'Форма не валидна')
     else:
@@ -188,20 +186,23 @@ def show_expert(request, id):
 
 @is_moderator
 def edit_expert(request, id):
-    expert = Expert.objects.get(id=id)
-    if request.method == "POST":
-        form = ExpertForm(request.POST)
-        if form.is_valid():
-            expert.email = request.POST["email"]
-            expert.first_name = request.POST["first_name"]
-            expert.last_name = request.POST["last_name"]
-            expert.middle_name = request.POST["middle_name"]
-            expert.profession = request.POST["profession"]
-            expert.professional_experience = request.POST["professional_experience"]
-            expert.position = request.POST["position"]
-            expert.driver_license = request.POST["driver_license"]
-            expert.driving_experience = request.POST["driving_experience"]
-            expert.save()
+    try:
+        expert = Expert.objects.get(id=id)
+        if request.method == "POST":
+            form = ExpertForm(request.POST)
+            if form.is_valid():
+                expert.email = request.POST["email"]
+                expert.first_name = request.POST["first_name"]
+                expert.last_name = request.POST["last_name"]
+                expert.middle_name = request.POST["middle_name"]
+                expert.profession = request.POST["profession"]
+                expert.professional_experience = request.POST["professional_experience"]
+                expert.position = request.POST["position"]
+                expert.driver_license = request.POST["driver_license"]
+                expert.driving_experience = request.POST["driving_experience"]
+                expert.save()
+    except Exception:
+        messages.error(request, "Заданный пользователь не найден")
 
     return HttpResponseRedirect(reverse("account:experts"))
 
