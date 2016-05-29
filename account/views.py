@@ -115,7 +115,7 @@ def change_password(request):
     email = request.user.email
     if request.method == "POST":
         form = PasswordChangeForm(request.POST)
-        if form.is_valid():  # Todo форма должна проверть, что новый пароль верно подтвержден
+        if form.is_valid():
             if profile.check_password(request.POST["old_password"]):
                 logout(request)
                 profile.set_password(request.POST["new_password"])

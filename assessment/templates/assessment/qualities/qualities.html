@@ -2,32 +2,24 @@
 
 {% block main %}
     {% if user.is_moderator or user.is_admin %}
-    <form action="{% url "assessment:new_quality" %}">
-        <button class="btn btn-md btn-success right-block">Добавить</button>
-    </form>
+        <form action="{% url "assessment:new_quality" %}">
+            <button class="btn btn-md btn-success right-block">Добавить</button>
+        </form>
     {% endif %}
     <table class="table table-striped">
         <thead>
         <th>Название</th>
         <th>Категория</th>
         <th>Описание</th>
-        {% if user.is_moderator %}
-            <th> Оценка </th>
-        {% endif %}
+        <th> Оценка</th>
         <tbody>
         {% for quality in qualities %}
-            {% if user.is_moderator %}
-                <tr onclick="window.location.href='{% url "assessment:edit_quality" quality.id %}'; return false">
-                    {% elif user.is_expert %}
-                <tr onclick="window.location.href='/assessment/{{ quality.id }}/'; return false">
-            {% endif %}
-        <td>{{ quality.quality }}</td>
-        <td>{{ quality.get_category }}</td>
-        <td>{{ quality.description|truncatechars:80 }}</td>
-        {% if user.is_moderator %}
-            <td> {{ quality.average_assessment }} </td>
-        {% endif %}
-        </tr>
+            <tr onclick="window.location.href='{% url "assessment:edit_quality" quality.id %}'; return false">
+                <td>{{ quality.quality }}</td>
+                <td>{{ quality.get_category }}</td>
+                <td>{{ quality.description|truncatechars:80 }}</td>
+                <td>{{ quality.average_assessment }} </td>
+            </tr>
         {% endfor %}
         </tbody>
     </table>

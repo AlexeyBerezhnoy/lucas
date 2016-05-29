@@ -18,6 +18,11 @@ def validate_experience(value):
         raise ValidationError("Поддерживаются только целые числа от 0 до 99")
 
 
+def validate_quality_id(value):
+    if not re.match(r'^(0|[1-9][0-9]*)$', str(value)):
+        raise ValidationError("Поддерживаются только целые числа от 0 до 99")
+
+
 def validate_point(value):
     if not re.match(r'^(0|[1-9][0-9]?)$', str(value)):
         raise ValidationError("Поддерживаются только целые числа от 0 до 99")
