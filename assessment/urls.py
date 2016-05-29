@@ -7,5 +7,5 @@ urlpatterns = [
     url(r'^quality/(\d+)/$', views.edit_quality, name="edit_quality"),
     url(r'^del_quality/(\d+)/$', views.del_quality, name="del_quality"),
     url(r'^assessments/$', views.show_assessments, name="assessments"),
-    url(r'^assessment/(\d+)/$', views.new_assessment, name="new_assessment"),
+    url(r'^edit_assessments$', views.edit_assessments, name="edit_assessments"),
 ]

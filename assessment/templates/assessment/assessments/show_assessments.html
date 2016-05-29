@@ -1,0 +1,51 @@
+{% extends "account/base/cabinet.html" %}
+
+{% block loadstatic %}
+    {{ block.super }}
+    {% load staticfiles %}
+    <link href="{% static 'assessment/css/style.css' %}" rel="stylesheet">
+{% endblock %}
+
+{% block main %}
+    <div id="collapse-group">
+        <form action="{% url "assessment:edit_assessments" %}" method="post">
+            {% for category, quality_set in qualities.items %}
+                <div class="row">
+                    <div class="col-lg-3 col-md-3">
+                        <span id="id-{{ forloop.counter }}">
+                            <a href="#{{ forloop.counter }}"
+                               class="category"
+                               data-toggle="collapse"
+                               data-parent="#collapse-group">{{ category }}
+                                {% if quality_set.not_assessment %}
+                                    ({{ quality_set.not_assessment }}!)
+                                {% endif %}</a>
+                        </span>
+                    </div>
+                    <div id="{{ forloop.counter }}" class="panel-collapse collapse">
+                        <div class="col-lg-9 col-md-9">
+                            {% for quality in quality_set %}
+                                <div class="row">
+                                    <div class="col-lg-10 col-md-10 col-sm-10 col-10">
+                                        <p><label>{{ quality }}</label></p>
+                                        <p>{{ quality.description }}</p>
+                                    </div>
+                                    <div class="col-lg-2 col-md-2 col-sm-2 col-2">
+                                        <input type="text" class="form-control" name="{{ quality.id }}"
+                                               value="{{ quality.point }}">
+                                    </div>
+                                </div>
+                                {% if not forloop.last %}
+                                    <hr>{% endif %}
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+                {% if not forloop.last %}
+                    <hr>{% endif %}
+            {% endfor %}
+            <button type="submit" class="s-btn btn btn-md my-btn btn-success">Оценить</button>
+        </form>
+    </div>
+
+{% endblock %}

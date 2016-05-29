@@ -2,14 +2,6 @@
 
 {% block main %}
     <form action="{% url "assessment:edit_quality" quality.id %}" method="post">
-        {% csrf_token %}
-{#        <label>Название</label>#}
-{#        <input type="text" class="form-control" value="{{ quality.quality }}" name="quality">#}
-{#        <label>Категория</label>#}
-{#        <input type="" class="form-control" value="{{ quality.category }}" name="quality">#}
-{#        <label>Описание</label>#}
-{#        <textarea class="form-control" name="description">{{ quality.description }}</textarea>#}
-{#        #}
     {{ form }}
     <button type="submit" class="s-btn btn btn-md btn-success">Сохранить</button>
     </form>

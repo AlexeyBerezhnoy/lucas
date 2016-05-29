@@ -18,7 +18,7 @@
     <div class="container">
         <a class="navbar-brand" href="{% url 'account:cabinet' %}">Lucas</a>
         {% if request.user.is_authenticated %}
-            {# TODO: Сделать так чтобы logout был всегда слева #}
+            {# TODO: Сделать так чтобы logout был всегда спарава #}
             <a class="navbar-brand navbar-right" href="{% url "account:logout" %}">выйти</a>
         {% endif %}
     </div>
