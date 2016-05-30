@@ -18,7 +18,11 @@
                 <td>{{ quality.quality }}</td>
                 <td>{{ quality.get_category }}</td>
                 <td>{{ quality.description|truncatechars:80 }}</td>
-                <td>{{ quality.average_assessment }} </td>
+                {% if coherence %}
+                    <td>{{ quality.average_assessment }} </td>
+                {% else %}
+                    <td>{{ None }}</td>
+                {% endif %}
             </tr>
         {% endfor %}
         </tbody>

@@ -1,8 +1,4 @@
 Django==1.9.2
-et-xmlfile==1.0.1
-jdcal==1.2
 numpy==1.11.0
-openpyxl==2.3.5
-ranking==0.3.1
 scipy==0.17.0
 xlrd==0.9.4

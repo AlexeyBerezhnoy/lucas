@@ -1,11 +1,14 @@
 import re
 from django.contrib import messages
+from django.core import serializers
 from django.core.urlresolvers import reverse
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, JsonResponse
 from django.shortcuts import render
+import scipy
 from account.forms import NoError
 from account.views import is_moderator, is_auth
-from assessment.forms import QualityForm
+from assessment.forms import QualityForm, AssessmentForm
+from assessment.math import math_func
 from assessment.models import Quality, Assessment, QUALITY_CATEGORY
 from account.models import Expert
 from django.core.exceptions import ObjectDoesNotExist
@@ -16,12 +19,19 @@ def edit_assessments(request):
     user = Expert.objects.get(email=request.user.email)
 
     if request.method == "POST":
+        message = ""
         for quality_id, point in request.POST.items():
-            # TODO: Сделай валидаторы
-            if re.match(r'\d+', str(quality_id)) and re.match(r'\d+', str(point)):
+            form = AssessmentForm({"quality": quality_id,
+                                   "point": point})
+            if form.is_valid():
                 Assessment.objects.update_or_create(expert=user,
                                                     quality=Quality.objects.get(id=quality_id),
                                                     defaults={"point": point})
+            else:
+                message = "форма не валидна"
+
+        if message:
+            messages.info(request, message)
 
     need_assessment = 0
     qualities = {}
@@ -46,7 +56,30 @@ def show_assessments(request):
 
 
 def show_qualities(request):
-    return render(request, 'assessment/qualities/qualities.html', {"qualities": Quality.objects.all()})
+    qualities = Quality.objects.all()
+
+    # Найти согласованость
+    table = []
+    for e in Expert.objects.all():
+        if e.is_expert and e.is_active:
+            assessments = []
+            mask = []
+            for q in qualities:
+                try:
+                    assessments.append(Assessment.objects.get(expert=e, quality=q).point)
+                    mask.append(0)
+                except Exception:
+                    assessments.append(0)
+                    mask.append(1)
+            masked_assessments = scipy.ma.array(assessments, mask=mask)
+            table.append(masked_assessments)
+
+    if table:
+        coherence = math_func(table)
+    else:
+        coherence = False
+    return render(request, 'assessment/qualities/qualities.html', {"qualities": qualities,
+                                                                   "coherence": coherence})
 
 
 @is_moderator

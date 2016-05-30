@@ -17,7 +17,7 @@ def math_func(table):
     # table = [[10, 9, 7, 5, 9],
     #          [9, 8, 8, 6, 8],
     #          [10, 9, 8, 4, 9]]
-    table = scipy.array(table)
+    # table = scipy.array(table)
     print(table)
 
     # 1. Переводим оценки группы экспертов из баллов в ранги.
@@ -78,10 +78,8 @@ def math_func(table):
     # помощью коэффициента конкордации Кендэлла производится согласно
     # следующему альтернативному соглашению:
     if chi2 >= critical_chi:
-        print("yes")
         return False
     else:
-        print("no")
         return True
 
 

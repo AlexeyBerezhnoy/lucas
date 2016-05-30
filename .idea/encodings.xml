@@ -9,8 +9,10 @@
     <file url="file://$PROJECT_DIR$/account/templates/account/profile/_moderator_profile.html" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/account/templates/account/profile/edit_profile.html" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/account/templates/account/profile/show_profile.html" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/account/validator.py" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/assessment/forms.py" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/assessment/math.py" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/assessment/static/assessment/js/visualisation.js" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/assessment/templates/assessment/assessments/show_assessments.html" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/static/css/style.css" charset="UTF-8" />
   </component>

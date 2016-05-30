@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import BaseUserManager, AbstractBaseUser, PermissionsMixin
+from account.validator import validate_name, validate_profession, validate_experience
 
 CATEGORIES = ['A', 'A1', 'B', 'B1', 'BE', 'C', 'C1', 'CE', 'C1E', 'D', 'D1', 'DE', 'D1E', 'M', 'Tm', 'Tb']
 
@@ -34,20 +35,36 @@ class MyUserManager(BaseUserManager):
 
 
 class MyUser(AbstractBaseUser, PermissionsMixin):
-    email = models.EmailField("email", unique=True)
-    last_name = models.CharField("фамилия", max_length=30)
-    first_name = models.CharField("имя", max_length=30)
-    middle_name = models.CharField("отчество", max_length=30)
+    email = models.EmailField("email",
+                              unique=True)
+    last_name = models.CharField("фамилия",
+                                 max_length=30,
+                                 validators=[validate_name])
+    first_name = models.CharField("имя",
+                                  max_length=30,
+                                  validators=[validate_name])
+    middle_name = models.CharField("отчество",
+                                   max_length=30,
+                                   validators=[validate_name])
 
-    profession = models.CharField("профессия", max_length=30, blank=True)
-    position = models.CharField("должность", max_length=30, blank=True)
-    professional_experience = models.PositiveSmallIntegerField("опыт работы", null=True)
+    profession = models.CharField("профессия",
+                                  max_length=30,
+                                  blank=True,
+                                  validators=[validate_profession])
+    position = models.CharField("должность",
+                                max_length=30,
+                                blank=True,
+                                validators=[validate_profession])
+    professional_experience = models.PositiveSmallIntegerField("опыт работы",
+                                                               null=True,
+                                                               validators=[validate_experience])
     driver_license = models.CharField("Водительское удостоверение",
                                       max_length=30,
                                       blank=True,
                                       choices=((cat, cat) for cat in CATEGORIES))
     driving_experience = models.IntegerField("опыт работы",
-                                             null=True)
+                                             null=True,
+                                             validators=[validate_experience])
 
     is_expert = models.BooleanField(default=False)
     is_moderator = models.BooleanField(default=False)

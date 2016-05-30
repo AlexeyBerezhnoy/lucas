@@ -1,17 +1,35 @@
 ﻿{% extends "account/base/cabinet.html" %}
 
 {% block title %}Оценки{% endblock %}
-
+{#{% block loadstatic %}#}
+{#    {{ block.super }}#}
+{#    {% load staticfiles %}#}
+{#    <script src="https://www.gstatic.com/charts/loader.js"></script>#}
+{#    <script>#}
+{#        google.charts.load('current', {'packages': ['corechart']});#}
+{#        google.charts.setOnLoadCallback(drawChart);#}
+{#        function drawChart() {#}
+{#            var data = new google.visualization.DataTable();#}
+{#            data.addColumn('string', 'Качества'); // Implicit domain label col.#}
+{#            data.addColumn('number', 'Оценки'); // Implicit series 1 data col.#}
+{#            data.addRows([#}
+{#                {% for assessment in assessments %}#}
+{#                    ['{{ assessment.quality }}', {{ assessment.point }}],#}
+{#                {% endfor %}#}
+{#            ]);#}
+{##}
+{#            var options = {#}
+{#                hAxis: {title: 'Качества'},#}
+{#                vAxis: {title: 'Оценки', minValue: 0, maxValue: 10},#}
+{#                legend: 'none'#}
+{#            };#}
+{##}
+{#            var chart = new google.visualization.ScatterChart(document.getElementById('chart_div'));#}
+{##}
+{#            chart.draw(data, options);#}
+{#        }#}
+{#    </script>#}
+{#{% endblock %}#}
 {% block main %}
-    <table class="table table-striped">
-    {% for assessment in assessments %}
-        <tr>
-            {% if user.is_moderator or user.is_admin %}
-                <td>Пользователь {{ assessment.expert }} оценил {{ assessment.quality }} в {{ assessment.point }} баллов</td>
-            {% elif uder.is_expert %}
-{#                <td><a href="/assessment/{{ quality.id }}/">{{ quality }}</a></td>#}
-            {% endif %}
-        </tr>
-    {% endfor %}
-    </table>
+{#    <div id="chart_div" style="width: 900px; height: 500px;"></div>#}
 {% endblock %}
