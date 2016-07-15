@@ -7,8 +7,7 @@ CATEGORIES = ['A', 'A1', 'B', 'B1', 'BE', 'C', 'C1', 'CE', 'C1E', 'D', 'D1', 'DE
 
 class MyUserManager(BaseUserManager):
     def create_moderator(self, email, last_name, first_name, middle_name):
-        # TODO: Сделай email нормальным
-        user = self.model(email=email,
+        user = self.model(email=self.normalize_email(email),
                           last_name=last_name,
                           first_name=first_name,
                           middle_name=middle_name)
@@ -26,12 +25,7 @@ class MyUserManager(BaseUserManager):
         user.save()
 
     def create_superuser(self, email, password):
-        user = self.model(email=self.normalize_email(email))
-        user.set_password(password)
-        user.is_active = True
-        user.is_admin = True
-        user.is_moderator = True
-        user.save()
+        pass
 
 
 class MyUser(AbstractBaseUser, PermissionsMixin):
