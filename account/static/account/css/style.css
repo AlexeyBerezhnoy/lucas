@@ -54,6 +54,16 @@
     /*display: inline-block;*/
     /*width: auto;*/
     padding: 20px 40px;
+    overflow-x: hidden;
+}
+
+@media screen and (max-width: 767px) {
+     .main { padding-left: 70px; }
+     .messages { margin-left: 70px; }
+}
+
+@media screen and (max-width: 1000px) {
+     .messages { margin-left: 55px; }
 }
 
 .nav-sidebar {
@@ -82,9 +92,8 @@
     background-color: #428bca;
 }
 
-.messages{
+.messages {
     list-style-type: none;
-    padding: 0;
 }
 
 .alert-error {
@@ -105,4 +114,8 @@ td {
 
 .inline-form {
     display: inline-block;
+}
+
+.active {
+    background-color: #CFCBF0;
 }

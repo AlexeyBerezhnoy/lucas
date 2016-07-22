@@ -88,7 +88,7 @@ def edit_profile(request):
                 profile.last_name = request.POST["last_name"]
                 profile.middle_name = request.POST["middle_name"]
                 profile.save()
-                messages.success(request, 'Информация не валидна.')
+                messages.success(request, 'Информация изменена.')
             else:
                 messages.error(request, 'Форма не валидна')
         elif user.is_expert:
@@ -99,7 +99,7 @@ def edit_profile(request):
                 profile.last_name = request.POST["last_name"]
                 profile.middle_name = request.POST["middle_name"]
                 profile.save()
-                messages.success(request, 'Информация не валидна.')
+                messages.success(request, 'Инфомрация изменена.')
             else:
                 messages.error(request, 'Форма не валидна')
     else:
