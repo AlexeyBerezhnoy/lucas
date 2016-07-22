@@ -1,10 +1,9 @@
-from django.core.exceptions import ValidationError
+from django.core.exceptions import ValidationError, ObjectDoesNotExist
 from django.core.management.base import BaseCommand
 from django.template.loader import render_to_string
-from account.models import Moderator
-from account.validator import validate_name
 from django.core.validators import validate_email
-import getpass
+from account.validator import validate_name
+from account.models import Moderator
 from account.views import get_new_password
 from account.views import send_message
 
@@ -13,13 +12,18 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         while True:
             self.stdout.write('Email:', ending=" ")
-            email = input()
+            email = input().lower()
             try:
                 validate_email(email)
             except ValidationError:
                 self.stderr.write("email невалиден")
             else:
-                break
+                try:
+                    Moderator.objects.get(email=email)
+                except ObjectDoesNotExist:
+                    break
+                else:
+                    self.stderr.write("email уже используется")
 
         while True:
             self.stdout.write('Фамилия:', ending=" ")
