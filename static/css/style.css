@@ -15,6 +15,12 @@ body {
     display: inline-block;
 }
 
+@media screen and (max-width: 350px) {
+     .btn-success { width: 93px;
+              padding-left: 5px;
+              margin-right: 6px;}
+}
+
 form label {
     margin: 5px 0;
 }
