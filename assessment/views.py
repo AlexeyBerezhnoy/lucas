@@ -1,4 +1,6 @@
 import re
+from enum import Enum
+
 from django.contrib import messages
 from django.core import serializers
 from django.core.urlresolvers import reverse
@@ -52,7 +54,21 @@ def edit_assessments(request):
 
 @is_moderator
 def show_assessments(request):
-    return render(request, 'assessment/assessments/assessments.html', {"assessments": Assessment.objects.all()})
+    if request.method == "GET":
+        return render(request, 'assessment/assessments/assessments.html', {"assessments": Assessment.objects.all()})
+    if request.method == "JSON":
+        categories = [quality.quality for quality in Quality.objects.all()]
+        series = []
+
+        qualities = Quality.objects.all()
+        for quality in qualities:
+            s = {'data': [[a.point, categories.index(quality.quality)] for a in quality.assessment_set.all()]}
+            series.append(s)
+        result = {
+            "categories": categories,
+            "series": series
+        }
+        return JsonResponse(result, safe=False)
 
 
 def show_qualities(request):
