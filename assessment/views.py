@@ -57,12 +57,13 @@ def show_assessments(request):
     if request.method == "GET":
         return render(request, 'assessment/assessments/assessments.html', {"assessments": Assessment.objects.all()})
     if request.method == "JSON":
+        # Todo: ут всё очень плохо
         categories = [quality.quality for quality in Quality.objects.all()]
         series = []
 
-        qualities = Quality.objects.all()
-        for quality in qualities:
-            s = {'data': [[a.point, categories.index(quality.quality)] for a in quality.assessment_set.all()]}
+        for expert in Expert.objects.all():
+            s = {'name': expert.__str__(),
+                 'data': [[a.point, categories.index(a.quality.quality)] for a in expert.assessment_set.all()]}
             series.append(s)
         result = {
             "categories": categories,

@@ -11,36 +11,81 @@
 {% block js %}
     {{ block.super }}
     <script src="http://code.highcharts.com/highcharts.js"></script>
-<script language="JavaScript">
-$(document).ready(function() {
-   var chart = {
-      type: 'scatter'
-   };
+    <script language="JavaScript">
+        $(document).ready(function () {
+            var chart = {
+                type: 'scatter'
+            };
 
-   
+            var title = {
+                text: null
+            };
 
-   var yAxis = {
-       categories: []
-   };
+            var xAxis = {
+                allowDecimals: false,
+                floor: 0,
+                ceiling: 10,
+                labels: {
+                    step: 1
+                },
+                min: 0,
+                max: 10,
+                tickInterval: 1
+            };
 
-   var series;
-   $.ajax({
-      url:"http://127.0.0.1:8000/assessments/",
-       method: 'JSON',
-       async: false,
-      success:function(result){
-          series = result.series;
-          yAxis.categories = result.categories;
-          console.log(result)
-      }
-      });
-    console.log(series)
-   var json = {};
-   json.yAxis = yAxis;
-   json.chart = chart;
-   json.series = series;
-   $('#container').highcharts(json);
+            var yAxis = {
+                title: null,
+                type: 'category',
+                categories: [],
+                gridLineWidth: 0
+            };
 
-});
-</script>
+            var plotOptions = {
+                series: {
+                    marker: {
+                        radius: 5,
+                        symbol: 'circle',
+                        fillColor: "rgba(255,0,0,0.15)"
+                    },
+                    showInLegend: false
+                }
+            };
+
+            var marker = {
+                symbol: 'circle'
+            };
+
+            var series;
+            var categories;
+            $.ajax({
+                url: "http://127.0.0.1:8000/assessments/",
+                method: 'JSON',
+                async: false,
+                success: function (result) {
+                    series = result.series;
+                    categories = result.categories;
+                    yAxis.categories = categories;
+                }
+            });
+
+            var tooltip = {
+                formatter: function () {
+                    return this.series.name + ' оценил' + "<br>" +
+                            this.series.yAxis.categories[this.point.y] +
+                            ' в ' + this.x + ' баллов';
+                }
+            };
+
+
+            var json = {};
+            json.tooltip = tooltip;
+            json.title = title;
+            json.plotOptions = plotOptions;
+            json.xAxis = xAxis;
+            json.yAxis = yAxis;
+            json.chart = chart;
+            json.series = series;
+            $('#container').highcharts(json);
+        });
+    </script>
 {% endblock %}
