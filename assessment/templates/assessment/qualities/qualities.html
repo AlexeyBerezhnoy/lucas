@@ -16,7 +16,7 @@
         {% for quality in qualities %}
             <tr onclick="window.location.href='{% url "assessment:edit_quality" quality.id %}'; return false">
                 <td>{{ quality.quality }}</td>
-                <td>{{ quality.get_category }}</td>
+                <td>{{ quality.get_category_display }}</td>
                 <td>{{ quality.description|truncatechars:80 }}</td>
                 {% if coherence %}
                     <td>{{ quality.average_assessment }} </td>

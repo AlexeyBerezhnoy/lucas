@@ -31,11 +31,6 @@ class Quality(models.Model):
     def __str__(self):
         return self.quality
 
-    def get_category(self):
-        for category in QUALITY_CATEGORY:
-            if self.category == category[0]:
-                return category[1]
-
     def average_assessment(self):
         return scipy.average([i.point for i in self.assessment_set.all()])
 
