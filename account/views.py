@@ -50,25 +50,12 @@ def is_expert(func):
 @is_auth
 def show_profile(request):
     user = request.user
-    profile = MyUser.objects.get(email=user.email)
+    profile = MyUser.objects.filter(email=user.email).values()[0]
     profile_form = "Отсутсвует информация"
     if user.is_moderator:
-        profile_form = ModeratorForm({"email": profile.email,
-                                      "last_name": profile.last_name,
-                                      "first_name": profile.first_name,
-                                      "middle_name": profile.middle_name},
-                                     error_class=NoError)
+        profile_form = ModeratorForm(profile, error_class=NoError)
     elif user.is_expert:
-        profile_form = ExpertForm({"email": profile.email,
-                                   "last_name": profile.last_name,
-                                   "first_name": profile.first_name,
-                                   "middle_name": profile.middle_name,
-                                   "profession": profile.profession,
-                                   "professional_experience": profile.professional_experience,
-                                   "position": profile.position,
-                                   "driver_license": profile.driver_license,
-                                   "driving_experience": profile.driving_experience},
-                                  error_class=NoError)
+        profile_form = ExpertForm(profile, error_class=NoError)
     password_change_form = PasswordChangeForm()
     return render(request, "account/profile/show_profile.html", {"profile": profile,
                                                                  "profile_form": profile_form,
@@ -78,27 +65,19 @@ def show_profile(request):
 @is_auth
 def edit_profile(request):
     user = request.user
-    profile = MyUser.objects.get(email=user.email)
+    profile = MyUser.objects.filter(email=user.email)
     if request.method == "POST":
         if user.is_moderator:
             form = ModeratorForm(request.POST)
             if form.is_valid():
-                profile.email = request.POST["email"]
-                profile.first_name = request.POST["first_name"]
-                profile.last_name = request.POST["last_name"]
-                profile.middle_name = request.POST["middle_name"]
-                profile.save()
+                profile.update(**form.cleaned_data)
                 messages.success(request, 'Информация изменена.')
             else:
                 messages.error(request, 'Форма не валидна')
         elif user.is_expert:
             form = ModeratorForm(request.POST)
             if form.is_valid():
-                profile.email = request.POST["email"]
-                profile.first_name = request.POST["first_name"]
-                profile.last_name = request.POST["last_name"]
-                profile.middle_name = request.POST["middle_name"]
-                profile.save()
+                profile.update(**form.cleaned_data)
                 messages.success(request, 'Инфомрация изменена.')
             else:
                 messages.error(request, 'Форма не валидна')
@@ -135,16 +114,7 @@ def new_expert(request):
         form = ExpertForm(request.POST, error_class=NoError)
         if form.is_valid():
             try:
-                # TODO с этим нужно что-то сделать, возможно переопределить конструктор класса Expert
-                Expert.objects.create_expert(email=request.POST["email"],
-                                             last_name=request.POST["last_name"],
-                                             first_name=request.POST["first_name"],
-                                             middle_name=request.POST["middle_name"],
-                                             profession=request.POST["profession"],
-                                             professional_experience=request.POST["professional_experience"],
-                                             position=request.POST["position"],
-                                             driver_license="A",
-                                             driving_experience=2)
+                Expert.objects.create_expert(**form.cleaned_data)
                 password = get_new_password()
                 e = Expert.objects.get(email=request.POST["email"])
                 e.set_password(password)
@@ -166,16 +136,8 @@ def new_expert(request):
 @is_moderator
 def show_expert(request, id):
     try:
-        expert = Expert.objects.get(id=id)
-        form = ExpertForm({"email": expert.email,
-                           "last_name": expert.last_name,
-                           "first_name": expert.first_name,
-                           "middle_name": expert.middle_name,
-                           "profession": expert.profession,
-                           "professional_experience": expert.professional_experience,
-                           "position": expert.position,
-                           "driver_license": expert.driver_license,
-                           "driving_experience": expert.driving_experience})
+        expert = Expert.objects.filter(id=id).values()[0]
+        form = ExpertForm(expert)
     # Todo: Отлови нормальное исключение
     except Exception:
         messages.error(request, "Заданный пользователь не найден")
@@ -187,20 +149,11 @@ def show_expert(request, id):
 @is_moderator
 def edit_expert(request, id):
     try:
-        expert = Expert.objects.get(id=id)
+        expert = Expert.objects.filter(id=id)
         if request.method == "POST":
             form = ExpertForm(request.POST)
             if form.is_valid():
-                expert.email = request.POST["email"]
-                expert.first_name = request.POST["first_name"]
-                expert.last_name = request.POST["last_name"]
-                expert.middle_name = request.POST["middle_name"]
-                expert.profession = request.POST["profession"]
-                expert.professional_experience = request.POST["professional_experience"]
-                expert.position = request.POST["position"]
-                expert.driver_license = request.POST["driver_license"]
-                expert.driving_experience = request.POST["driving_experience"]
-                expert.save()
+                expert.update(**form.cleaned_data)
     except Exception:
         messages.error(request, "Заданный пользователь не найден")
 
