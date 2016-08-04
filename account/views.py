@@ -1,10 +1,14 @@
+from django.contrib.auth.decorators import login_required
 from django.core.mail import send_mail
 from django.db import IntegrityError
 from django.contrib.auth import authenticate, login, logout
-from django.core.urlresolvers import reverse
+from django.core.urlresolvers import reverse, reverse_lazy
 from django.http import HttpResponseRedirect, HttpResponse
 from django.shortcuts import render
 from django.template.loader import render_to_string
+from django.utils.decorators import method_decorator
+from django.views.generic.edit import FormView, UpdateView
+
 from account.models import MyUser
 from assessment.models import Expert
 from account.forms import NoError, LoginForm, ExpertForm, ModeratorForm, PasswordChangeForm
@@ -45,45 +49,39 @@ def is_expert(func):
 
 
 # TODO: дай вьювам нормальные имена
+@method_decorator(login_required, name='dispatch')
+class ShowProfileView(FormView):
+    model = MyUser
+    success_url = reverse_lazy("account:cabinet")
+    template_name = 'account/profile/show_profile.html'
 
+    def get_form(self):
+        if self.get_object().is_moderator:
+            form = ModeratorForm
+        else:
+            form = ExpertForm
+        return form(**self.get_form_kwargs())
 
-@is_auth
-def show_profile(request):
-    user = request.user
-    profile = MyUser.objects.filter(email=user.email).values()[0]
-    profile_form = "Отсутсвует информация"
-    if user.is_moderator:
-        profile_form = ModeratorForm(profile, error_class=NoError)
-    elif user.is_expert:
-        profile_form = ExpertForm(profile, error_class=NoError)
-    password_change_form = PasswordChangeForm()
-    return render(request, "account/profile/show_profile.html", {"profile": profile,
-                                                                 "profile_form": profile_form,
-                                                                 "password_change_form": password_change_form})
+    def get_context_data(self, **kwargs):
+        context = super(ShowProfileView, self).get_context_data(**kwargs)
+        context['password_change_form'] = PasswordChangeForm()
+        return context
 
+    def get_initial(self):
+        return self.model.objects.filter(email=self.get_object().email).values()[0]
 
-@is_auth
-def edit_profile(request):
-    user = request.user
-    profile = MyUser.objects.filter(email=user.email)
-    if request.method == "POST":
-        if user.is_moderator:
-            form = ModeratorForm(request.POST)
-            if form.is_valid():
-                profile.update(**form.cleaned_data)
-                messages.success(request, 'Информация изменена.')
-            else:
-                messages.error(request, 'Форма не валидна')
-        elif user.is_expert:
-            form = ModeratorForm(request.POST)
-            if form.is_valid():
-                profile.update(**form.cleaned_data)
-                messages.success(request, 'Инфомрация изменена.')
-            else:
-                messages.error(request, 'Форма не валидна')
-    else:
-        messages.error(request, 'Форма не заполнена')
-    return HttpResponseRedirect(reverse("account:cabinet"))
+    def get_object(self, queryset=None):
+        return self.request.user
+
+    def form_valid(self, form=None):
+        profile = MyUser.objects.filter(email=self.get_object().email)
+        profile.update(**form.cleaned_data)
+        messages.success(self.request, 'Информация изменена')
+        return HttpResponseRedirect(self.success_url)
+
+    def form_invalid(self, form=None):
+        messages.error(self.request, 'Форма невалидна')
+        return render(self.request, self.template_name, {"form": form})
 
 
 @is_auth

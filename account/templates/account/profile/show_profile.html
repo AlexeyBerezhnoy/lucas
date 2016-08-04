@@ -8,8 +8,8 @@
             <p>Информация о пользователе</p>
         </div>
         <div class="col-lg-9">
-            <form action="{% url "account:edit_profile" %}" method="post">
-                {{ profile_form }}
+            <form action="{% url "account:cabinet" %}" method="post">
+                {{ form }}
                 <button type="submit" class="s-btn btn btn-md btn-success">Подтвердить изменения</button>
             </form>
         </div>
