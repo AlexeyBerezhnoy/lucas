@@ -9,7 +9,7 @@
                 <p>Информация о пользователе</p>
             </div>
             <div class="col-lg-9">
-                <form action="{% url "account:edit_expert" expert.id %}" method="post">
+                <form action="{% url "account:expert" expert.id %}" method="post">
                     {{ form }}
                     <button type="submit" class="s-btn btn btn-md my-btn btn-success">Подтвердить изменения</button>
                 </form>
@@ -33,7 +33,7 @@
                         {% if expert.is_active %}Заблокировать аккаунт{% else %}Разблокировать аккаунт{% endif %}
                     </button>
                 </form>
-                <form class="inline-form" action="{% url "account:del_expert" expert.id %}">
+                <form class="inline-form" action="{% url "account:expert" expert.id %}">
                     <button type="submit" class="btn btn-md btn-danger s-btn">Удалить аккаунт</button>
                 </form>
             </div>

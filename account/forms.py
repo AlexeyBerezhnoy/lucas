@@ -2,7 +2,7 @@ from django.core.exceptions import ValidationError
 from django.forms.utils import ErrorList
 from django import forms
 
-from account.models import CATEGORIES
+from account.models import CATEGORIES, Expert
 
 
 # Todo: это ужасный костыль, убери его
@@ -20,26 +20,21 @@ class LoginForm(forms.Form):
                                                                  "placeholder": "пароль"}))
 
 
-class ExpertForm(forms.Form):
-    email = forms.EmailField(label="Email",
-                             widget=forms.TextInput(attrs={"class": "form-control"}))
-    last_name = forms.CharField(label="Фамилия",
-                                widget=forms.TextInput(attrs={"class": "form-control"}))
-    first_name = forms.CharField(label="Имя",
-                                 widget=forms.TextInput(attrs={"class": "form-control"}))
-    middle_name = forms.CharField(label="Отчество",
-                                  widget=forms.TextInput(attrs={"class": "form-control"}))
-    profession = forms.CharField(label="Профессия",
-                                 widget=forms.TextInput(attrs={"class": "form-control"}))
-    professional_experience = forms.CharField(label="Стаж работы",
-                                              widget=forms.TextInput(attrs={"class": "form-control"}))
-    position = forms.CharField(label="Должность",
-                               widget=forms.TextInput(attrs={"class": "form-control"}))
-    driver_license = forms.ChoiceField(label="Водительское удостоверние",
-                                       choices=((cat, cat) for cat in CATEGORIES),
-                                       widget=forms.Select(attrs={"class": "form-control"}))
-    driving_experience = forms.CharField(label="Водительский стаж",
-                                         widget=forms.TextInput(attrs={"class": "form-control"}))
+class ExpertForm(forms.ModelForm):
+    class Meta:
+        model = Expert
+        fields = ['email', 'last_name', 'first_name', 'middle_name',
+                  'profession', 'professional_experience', 'position',
+                  'driver_license', 'driving_experience']
+        widgets = {
+            'professional_experience': forms.TextInput(),
+            'driving_experience': forms.TextInput()
+        }
+
+    def __init__(self, *args, **kwargs):
+        super(ExpertForm, self).__init__(*args, **kwargs)
+        for field in self.fields:
+            self.fields[field].widget.attrs['class'] = 'form-control'
 
 
 class ModeratorForm(forms.Form):

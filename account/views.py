@@ -7,7 +7,8 @@ from django.http import HttpResponseRedirect, HttpResponse
 from django.shortcuts import render
 from django.template.loader import render_to_string
 from django.utils.decorators import method_decorator
-from django.views.generic.edit import FormView, UpdateView
+from django.views.generic import DetailView
+from django.views.generic.edit import FormView, UpdateView, FormMixin, DeletionMixin
 
 from account.models import MyUser
 from assessment.models import Expert
@@ -131,43 +132,12 @@ def new_expert(request):
     return render(request, "account/experts/new_expert.html", {"form": form})
 
 
-@is_moderator
-def show_expert(request, id):
-    try:
-        expert = Expert.objects.filter(id=id).values()[0]
-        form = ExpertForm(expert)
-    # Todo: Отлови нормальное исключение
-    except Exception:
-        messages.error(request, "Заданный пользователь не найден")
-        return HttpResponseRedirect(reverse("account:experts"))
-    return render(request, "account/experts/show_expert.html", {"expert": expert,
-                                                                "form": form})
-
-
-@is_moderator
-def edit_expert(request, id):
-    try:
-        expert = Expert.objects.filter(id=id)
-        if request.method == "POST":
-            form = ExpertForm(request.POST)
-            if form.is_valid():
-                expert.update(**form.cleaned_data)
-    except Exception:
-        messages.error(request, "Заданный пользователь не найден")
-
-    return HttpResponseRedirect(reverse("account:experts"))
-
-
-@is_moderator
-def del_expert(request, id):
-    try:
-        expert = Expert.objects.get(id=id)
-        expert.delete()
-        messages.success(request, "Пользователь удалён")
-        # Todo: Отлови нормальное исключение
-    except Exception:
-        messages.error(request, "Заданный пользователь не найден")
-    return HttpResponseRedirect(reverse("account:experts"))
+@method_decorator(is_moderator, name='dispatch')
+class ExpertView(UpdateView, DeletionMixin):
+    model = Expert
+    form_class = ExpertForm
+    template_name = 'account/experts/show_expert.html'
+    success_url = reverse_lazy('account:experts')
 
 
 @is_moderator
