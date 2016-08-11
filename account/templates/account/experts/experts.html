@@ -36,7 +36,7 @@
                 </tr>
             </thead>
             <tbody>
-                {% for expert in experts %}
+                {% for expert in object_list %}
                     <tr onclick="window.location.href='{% url "account:expert" expert.id %}'; return false">
                         <td>{{ expert.id }}</td>
                         <td>{{ expert }}</td>

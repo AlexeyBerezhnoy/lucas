@@ -62,7 +62,7 @@ class MyUser(AbstractBaseUser, PermissionsMixin):
                                       max_length=30,
                                       blank=True,
                                       choices=((cat, cat) for cat in CATEGORIES))
-    driving_experience = models.IntegerField("опыт работы",
+    driving_experience = models.IntegerField("Водительский стаж",
                                              null=True,
                                              validators=[validate_experience])
 
@@ -116,6 +116,9 @@ class Expert(MyUser):
         """
         if not self.driver_license:
             self.driving_experience = False
+
+        self.is_expert = True
+
         super(Expert, self).save(*args, **kwargs)
 
     class Meta:

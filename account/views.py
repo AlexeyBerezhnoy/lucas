@@ -1,17 +1,15 @@
 from django.contrib.auth.decorators import login_required
 from django.core.mail import send_mail
-from django.db import IntegrityError
 from django.contrib.auth import authenticate, login, logout
 from django.core.urlresolvers import reverse, reverse_lazy
 from django.http import HttpResponseRedirect, HttpResponse
 from django.shortcuts import render
 from django.template.loader import render_to_string
 from django.utils.decorators import method_decorator
-from django.views.generic import DetailView
-from django.views.generic.edit import FormView, UpdateView, FormMixin, DeletionMixin
+from django.views.generic import ListView
+from django.views.generic.edit import FormView, UpdateView, DeletionMixin, CreateView
 
-from account.models import MyUser
-from assessment.models import Expert
+from account.models import MyUser, Expert
 from account.forms import NoError, LoginForm, ExpertForm, ModeratorForm, PasswordChangeForm
 from django.contrib import messages
 
@@ -47,6 +45,26 @@ def is_expert(func):
         return HttpResponseRedirect(reverse("account:login"))
 
     return view
+
+
+class SendEmailMixin:
+    email_template_name = ''  # path to template for email message
+    email_subject = ''
+    email_context_data = {}
+    from_email = 'admin@lucas.com'
+    receivers = tuple()
+
+    def get_email_context_data(self):
+        return self.email_context_data
+
+    def get_receivers(self):
+        return self.receivers
+
+    def render_email(self):
+        return render_to_string(self.email_template_name, self.get_email_context_data())
+
+    def send(self):
+        send_mail(self.email_subject, self.render_email(), self.from_email, self.get_receivers, fail_silently=False)
 
 
 # TODO: дай вьювам нормальные имена
@@ -107,29 +125,39 @@ def change_password(request):
     return HttpResponseRedirect(reverse("account:cabinet"))
 
 
-@is_moderator
-def new_expert(request):
-    if request.method == "POST":
-        form = ExpertForm(request.POST, error_class=NoError)
-        if form.is_valid():
-            try:
-                Expert.objects.create_expert(**form.cleaned_data)
-                password = get_new_password()
-                e = Expert.objects.get(email=request.POST["email"])
-                e.set_password(password)
-                e.save()
-                messages.success(request, "Пользователь добавлен")
+class ExpertList(ListView):
+    queryset = Expert.objects.filter(is_expert=True)
+    template_name = "account/experts/experts.html"
 
-                subject = "Пароль обновлён"
-                ctx = {'request': request, 'user': e, 'password': password}
-                message = render_to_string('account/email/invite_expert.html', ctx)
-                send_message(e.email, subject, message)
-                return HttpResponseRedirect(reverse("account:experts"))
-            except IntegrityError:
-                messages.error(request, "email занят")
-    else:
-        form = ExpertForm()
-    return render(request, "account/experts/new_expert.html", {"form": form})
+
+class CreateExpertView(CreateView, SendEmailMixin):
+    model = Expert
+    form_class = ExpertForm
+    object = None
+    password = None
+    template_name = 'account/experts/new_expert.html'
+    success_url = reverse_lazy('account:experts')
+
+    email_subject = 'Добро пожаловать'
+    email_template_name = 'account/email/invite_expert.html'
+    to = None
+
+    def form_valid(self, form):
+        self.object = form.save(commit=False)
+        self.password = get_new_password()
+        self.object.set_password(self.password)
+        self.object.save()
+        messages.success(self.request, "Пользователь добавлен")
+
+        self.send()
+
+        return HttpResponseRedirect(self.success_url)
+
+    def get_email_context_data(self):
+        return {'user': self.object, 'password': self.password}
+
+    def get_receivers(self):
+        return tuple(self.object.email)
 
 
 @method_decorator(is_moderator, name='dispatch')
@@ -155,12 +183,6 @@ def toggle_activity(request, id):
     except Exception:
         messages.error(request, "Заданный пользователь не найден")
     return HttpResponseRedirect(reverse("account:experts"))
-
-
-@is_moderator
-def show_experts(request):
-    experts = Expert.objects.filter(is_expert=True)
-    return render(request, "account/experts/experts.html", {"experts": experts})
 
 
 def reset_password(request, email):
