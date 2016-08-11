@@ -1,8 +1,9 @@
+from django.contrib.auth import authenticate
 from django.core.exceptions import ValidationError
 from django.forms.utils import ErrorList
 from django import forms
 
-from account.models import CATEGORIES, Expert
+from account.models import Expert
 
 
 # Todo: это ужасный костыль, убери его
@@ -18,6 +19,14 @@ class LoginForm(forms.Form):
     password = forms.CharField(label="",
                                widget=forms.PasswordInput(attrs={"class": "form-control field-signin",
                                                                  "placeholder": "пароль"}))
+
+    def get_user(self):
+        return authenticate(**self.cleaned_data)
+
+    def clean(self):
+        user = self.get_user()
+        if not user or user.is_anonymous():
+            raise ValidationError('Заданный пользователь не существует')
 
 
 class ExpertForm(forms.ModelForm):

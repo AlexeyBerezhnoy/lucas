@@ -64,7 +64,7 @@ class SendEmailMixin:
         return render_to_string(self.email_template_name, self.get_email_context_data())
 
     def send(self):
-        send_mail(self.email_subject, self.render_email(), self.from_email, self.get_receivers, fail_silently=False)
+        send_mail(self.email_subject, self.render_email(), self.from_email, self.get_receivers(), fail_silently=False)
 
 
 # TODO: дай вьювам нормальные имена
@@ -168,45 +168,62 @@ class ExpertView(UpdateView, DeletionMixin):
     success_url = reverse_lazy('account:experts')
 
 
-@is_moderator
-def toggle_activity(request, id):
-    try:
-        expert = Expert.objects.get(id=id)
-        if expert.is_active:
-            expert.is_active = False
-            messages.success(request, "Пользователь заморожен")
+class ToggleActivityExpertView(UpdateView):
+    http_method_names = ['get']
+    model = Expert
+    success_url = reverse_lazy('account:experts')
+
+    def get(self, form):
+        if self.object.is_active:
+            self.object.is_active = False
+            messages.success(self.request, "Пользователь заморожен")
         else:
-            expert.is_active = True
-            messages.success(request, "Пользователь разморожен")
+            self.object.is_active = True
+            messages.success(self.request, "Пользователь разморожен")
+        self.object.save()
+        HttpResponseRedirect(self.success_url)
+
+
+class ResetPasswordView(UpdateView, SendEmailMixin):
+    http_method_names = ['get']
+    model = Expert
+    success_url = reverse_lazy('account:experts')
+
+    email_template_name = 'account/email/new_password.html'
+    email_subject = 'Пароль обновлен'
+    from_email = 'admin@lucas.com'
+
+    password = ''
+
+    def get(self):
+        self.password = get_new_password()
+        expert = self.get_object()
+        expert.set_password(self.password)
         expert.save()
-        # Todo: Отлови нормальное исключение
-    except Exception:
-        messages.error(request, "Заданный пользователь не найден")
-    return HttpResponseRedirect(reverse("account:experts"))
+
+        self.send()
+        return HttpResponseRedirect(self.success_url)
+
+    def get_email_context_data(self):
+        return {'user': self.object, 'password': self.password}
+
+    def get_receivers(self):
+        return tuple(self.object.email)
 
 
-def reset_password(request, email):
-    request = generate_random_password(request, email)
-    return HttpResponseRedirect(reverse("account:experts"))
+class LoginView(FormView):
+    form_class = LoginForm
+    template_name = 'account/login.html'
+    success_url = reverse_lazy("account:cabinet")
 
-
-def my_login(request):
-    if request.user.is_authenticated():
+    def dispatch(self, request, *args, **kwargs):
         logout(request)
-    if request.method == "POST":
-        form = LoginForm(request.POST, error_class=NoError, auto_id=False)
-        if form.is_valid():
-            user = authenticate(email=request.POST["email"],
-                                password=request.POST["password"])
-            if user:
-                login(request, user)
-                return HttpResponseRedirect(reverse("account:cabinet"))
+        return super(LoginView, self).dispatch(request, *args, **kwargs)
 
-        messages.error(request, 'Введите правильные логин и пароль.')
-        return render(request, "account/login.html", {"form": form})
-    else:
-        form = LoginForm(auto_id=False)
-    return render(request, "account/login.html", {"form": form})
+    def form_valid(self, form):
+        login(self.request, form.get_user())
+
+        return HttpResponseRedirect(self.success_url)
 
 
 def forgot_password(request):
@@ -221,17 +238,6 @@ def forgot_password(request):
     else:
         form = LoginForm(auto_id=False)
     return render(request, "account/forgot_password.html", {"form": form})
-
-
-# TODO: перенаправь ссылку
-def confirm(request, email, password):
-    user = authenticate(email=email, password=password)
-    if user.is_active:
-        return HttpResponseRedirect(reverse("account:cabinet"))
-    else:
-        user.is_active = True
-        user.save()
-        return HttpResponse("passive")
 
 
 # Todo: Использовать здесь request не лучшая идея

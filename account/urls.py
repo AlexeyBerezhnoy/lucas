@@ -4,8 +4,8 @@ from . import views
 
 urlpatterns = [
     # url(r'^$', views.show_profile),
-    url(r'^logout/$', views.my_login, name="logout"),
-    url(r'^login/$', views.my_login, name="login"),
+    url(r'^logout/$', views.LoginView.as_view(), name="logout"),
+    url(r'^login/$', views.LoginView.as_view(), name="login"),
     url(r'^forgot_password/$', views.forgot_password, name="forgot_password"),
 
     url(r'^cabinet/$', views.ShowProfileView.as_view(), name="cabinet"),
@@ -17,6 +17,10 @@ urlpatterns = [
     ])),
 
     url(r'cabinet/expert/(?P<pk>\d+)/$', views.ExpertView.as_view(), name='expert'),
-    url(r'^cabinet/toggle_activity/(\d+)/$', views.toggle_activity, name="toggle_activity"),
-    url(r'^cabinet/reset_password/(\w*@\w*\.\w*)/$', views.reset_password, name="reset_password"),
+    url(r'cabinet/expert/(?P<pk>\d+)/$', include([
+        url(r'^$', views.ExpertView.as_view(), name='expert'),
+        url(r'toggle_activity/$', views.ToggleActivityExpertView.as_view(), name="toggle_activity"),
+        url(r'reset_password/$', views.ResetPasswordView.as_view(), name="reset_password")
+    ])),
+    # url(r'^cabinet/reset_password/(\w*@\w*\.\w*)/$', views.reset_password, name="reset_password"),
 ]
