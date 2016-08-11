@@ -140,24 +140,22 @@ class CreateExpertView(CreateView, SendEmailMixin):
 
     email_subject = 'Добро пожаловать'
     email_template_name = 'account/email/invite_expert.html'
-    to = None
 
     def form_valid(self, form):
         self.object = form.save(commit=False)
         self.password = get_new_password()
         self.object.set_password(self.password)
         self.object.save()
+
         messages.success(self.request, "Пользователь добавлен")
-
         self.send()
-
         return HttpResponseRedirect(self.success_url)
 
     def get_email_context_data(self):
         return {'user': self.object, 'password': self.password}
 
     def get_receivers(self):
-        return tuple(self.object.email)
+        return (self.object.email, )
 
 
 @method_decorator(is_moderator, name='dispatch')
@@ -208,7 +206,7 @@ class ResetPasswordView(UpdateView, SendEmailMixin):
         return {'user': self.object, 'password': self.password}
 
     def get_receivers(self):
-        return tuple(self.object.email)
+        return (self.object.email, )
 
 
 class LoginView(FormView):
