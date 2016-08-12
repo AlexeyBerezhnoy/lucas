@@ -1,15 +1,8 @@
 from django.contrib.auth import authenticate
 from django.core.exceptions import ValidationError
-from django.forms.utils import ErrorList
 from django import forms
 
-from account.models import Expert
-
-
-# Todo: это ужасный костыль, убери его
-class NoError(ErrorList):
-    def __str__(self):
-        return ""
+from account.models import Expert, MyUser
 
 
 class LoginForm(forms.Form):
@@ -68,3 +61,15 @@ class PasswordChangeForm(forms.Form):
     def clean(self):
         if self.cleaned_data.get('new_password') != self.cleaned_data.get('repeat_password'):
             raise ValidationError("Введёные пароли не совпадают")
+
+
+class ForgotPasswordForm(forms.Form):
+    email = forms.EmailField(label="Email",
+                             widget=forms.TextInput(attrs={"class": "form-control"}))
+
+    def clean(self):
+        if not MyUser.objects.filter(**self.cleaned_data):
+            raise ValidationError('Заданный пользователь не найден')
+
+    def get_user(self):
+        return MyUser.objects.get(**self.cleaned_data)

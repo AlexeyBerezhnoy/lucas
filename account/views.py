@@ -2,7 +2,7 @@ from django.contrib.auth.decorators import login_required
 from django.core.mail import send_mail
 from django.contrib.auth import authenticate, login, logout
 from django.core.urlresolvers import reverse, reverse_lazy
-from django.http import HttpResponseRedirect, HttpResponse
+from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from django.template.loader import render_to_string
 from django.utils.decorators import method_decorator
@@ -10,7 +10,7 @@ from django.views.generic import ListView
 from django.views.generic.edit import FormView, UpdateView, DeletionMixin, CreateView
 
 from account.models import MyUser, Expert
-from account.forms import NoError, LoginForm, ExpertForm, ModeratorForm, PasswordChangeForm
+from account.forms import LoginForm, ExpertForm, ModeratorForm, PasswordChangeForm, ForgotPasswordForm
 from django.contrib import messages
 
 
@@ -74,7 +74,7 @@ class ShowProfileView(FormView):
     success_url = reverse_lazy("account:cabinet")
     template_name = 'account/profile/show_profile.html'
 
-    def get_form(self):
+    def get_form(self, form_class=None):
         if self.get_object().is_moderator:
             form = ModeratorForm
         else:
@@ -89,7 +89,7 @@ class ShowProfileView(FormView):
     def get_initial(self):
         return self.model.objects.filter(email=self.get_object().email).values()[0]
 
-    def get_object(self, queryset=None):
+    def get_object(self):
         return self.request.user
 
     def form_valid(self, form=None):
@@ -103,26 +103,32 @@ class ShowProfileView(FormView):
         return render(self.request, self.template_name, {"form": form})
 
 
-@is_auth
-def change_password(request):
-    profile = MyUser.objects.get(email=request.user.email)
-    email = request.user.email
-    if request.method == "POST":
-        form = PasswordChangeForm(request.POST)
-        if form.is_valid():
-            if profile.check_password(request.POST["old_password"]):
-                logout(request)
-                profile.set_password(request.POST["new_password"])
-                profile.save()
-                user = authenticate(email=email,
-                                    password=request.POST["new_password"])
-                login(request, user)
-                messages.success(request, 'Пароль успешно изменён')
-            else:
-                messages.error(request, 'Старый пароль введен неверно')
-        else:
-            messages.error(request, 'Некорректно заполненая форма')
-    return HttpResponseRedirect(reverse("account:cabinet"))
+class ChangePasswordView(FormView):
+    http_method_names = ['post']
+    form_class = PasswordChangeForm
+    success_url = reverse_lazy('account:cabinet')
+
+    def form_valid(self, form):
+        user = self.get_object()
+
+        logout(self.request)
+
+        user.set_password(form.cleaned_data['new_password'])
+        user.save()
+
+        user = authenticate(email=user.email, password=form.cleaned_data['new_password'])
+        login(self.request, user)
+
+        messages.success(self.request, 'Пароль успешно изменён')
+        return HttpResponseRedirect(self.success_url)
+
+    def form_invalid(self, form):
+        print(form)
+        messages.error(self.request, 'Некорректно заполненая форма')
+        return HttpResponseRedirect(self.success_url)
+
+    def get_object(self):
+        return self.request.user
 
 
 class ExpertList(ListView):
@@ -171,7 +177,7 @@ class ToggleActivityExpertView(UpdateView):
     model = Expert
     success_url = reverse_lazy('account:experts')
 
-    def get(self, form):
+    def get(self, request, *args, **kwargs):
         if self.object.is_active:
             self.object.is_active = False
             messages.success(self.request, "Пользователь заморожен")
@@ -191,9 +197,9 @@ class ResetPasswordView(UpdateView, SendEmailMixin):
     email_subject = 'Пароль обновлен'
     from_email = 'admin@lucas.com'
 
-    password = ''
+    password = None
 
-    def get(self):
+    def get(self, request, *args, **kwargs):
         self.password = get_new_password()
         expert = self.get_object()
         expert.set_password(self.password)
@@ -224,41 +230,34 @@ class LoginView(FormView):
         return HttpResponseRedirect(self.success_url)
 
 
-def forgot_password(request):
-    if request.user.is_authenticated():
-        logout(request)
-    if request.method == "POST":
-        form = LoginForm(request.POST, error_class=NoError, auto_id=False)
-        # TODO: добавь проверку
-        if form:
-            request = generate_random_password(request, request.POST["email"])
-            return HttpResponseRedirect(reverse("account:login"))
-    else:
-        form = LoginForm(auto_id=False)
-    return render(request, "account/forgot_password.html", {"form": form})
+class ForgotPasswordView(FormView, SendEmailMixin):
+    form_class = ForgotPasswordForm
+    template_name = 'account/forgot_password.html'
+    success_url = reverse_lazy('account:login')
 
+    email_template_name = 'account/email/new_password.html'
+    email_subject = 'Пароль обновлен'
 
-# Todo: Использовать здесь request не лучшая идея
-def generate_random_password(request, email):
-    try:
-        user = MyUser.objects.get(email=email)
-        password = get_new_password()
-        user.set_password(password)
-        user.save()
-        messages.success(request, "Пароль обновлён")
+    object = None
+    password = None
 
-        subject = "Пароль обновлён"
-        ctx = {'request': request, 'user': user, 'password': password}
-        message = render_to_string('account/email/new_password.html', ctx)
-        send_message(email, subject, message)
-    except Exception:
-        messages.error(request, "Заданный пользователь не найден")
-    return request
+    def form_valid(self, form):
+        self.object = form.get_user()
+        self.password = get_new_password()
+        self.object.set_password(self.password)
+        self.object.save()
+
+        messages.success(self.request, 'пароль обновлен')
+        self.send()
+
+        return HttpResponseRedirect(self.success_url)
+
+    def get_receivers(self):
+        return (self.object.email, )
+
+    def get_email_context_data(self):
+        return {'user': self.object, 'password': self.password}
 
 
 def get_new_password(length=4):
-    return MyUser.objects.make_random_password(length=length, allowed_chars='ABCDEFGHJKLMNPQRSTUVWXYZ')
-
-
-def send_message(email, subject, message):
-    send_mail(subject, message, 'admin@lucas.com', [email], fail_silently=False)
+    return MyUser.objects.make_random_password(length=length)
