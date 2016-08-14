@@ -1,5 +1,5 @@
 from django.db import models
-from django.contrib.auth.models import BaseUserManager, AbstractBaseUser, PermissionsMixin
+from django.contrib.auth.models import BaseUserManager, AbstractBaseUser, PermissionsMixin, Permission
 from account.validator import validate_name, validate_profession, validate_experience
 
 CATEGORIES = ['A', 'A1', 'B', 'B1', 'BE', 'C', 'C1', 'CE', 'C1E', 'D', 'D1', 'DE', 'D1E', 'M', 'Tm', 'Tb']
@@ -88,9 +88,6 @@ class MyUser(AbstractBaseUser, PermissionsMixin):
     def __str__(self):
         return "%s %s. %s." % (self.last_name, self.first_name[0], self.middle_name[0])
 
-    def has_perm(self, perm, obj=None):
-        return True
-
     def has_module_perms(self, app_label):
         return True
 
@@ -104,6 +101,13 @@ class Moderator(MyUser):
 
     class Meta:
         proxy = True
+
+    def save(self, *args, **kwargs):
+        self.user_permissions.add(Permission.objects.get(codename='manipulate_expert'))
+        super(Moderator, self).save(*args, **kwargs)
+
+    def __str__(self):
+        return self.email
 
 
 class Expert(MyUser):
@@ -123,3 +127,6 @@ class Expert(MyUser):
 
     class Meta:
         proxy = True
+        permissions = (
+            ('manipulate_expert', 'Can create, edit, view and remove expert'),
+        )

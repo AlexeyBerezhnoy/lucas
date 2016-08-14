@@ -44,6 +44,8 @@ INSTALLED_APPS = (
 
 AUTH_USER_MODEL = 'account.MyUser'
 
+LOGIN_URL = '/login/'
+
 MIDDLEWARE_CLASSES = (
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',

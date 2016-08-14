@@ -1,4 +1,4 @@
-{% extends "account/experts/experts.html" %}
+{% extends "account/experts/index.html" %}
 
 {% block title %}{{ expert }}{% endblock %}
 
@@ -19,7 +19,7 @@
         <div class="row">
             <div class="col-lg-3 profile-settings-sidebar">Изменить пароль</div>
             <div class="col-lg-9">
-                <form action="{% url "account:reset_password" expert.email %}">
+                <form action="{% url "account:reset_password" expert.id %}">
                     <button type="submit" class="s-btn btn btn-md btn-danger">Сбросить пароль</button>
                 </form>
             </div>

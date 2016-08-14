@@ -1,9 +1,10 @@
 from django.conf.urls import url, include
+from django.views.generic import RedirectView
 from . import views
 
 
 urlpatterns = [
-    # url(r'^$', views.show_profile),
+    url(r'^$', RedirectView.as_view(url='cabinet/', permanent=False)),
     url(r'^logout/$', views.LoginView.as_view(), name="logout"),
     url(r'^login/$', views.LoginView.as_view(), name="login"),
     url(r'^forgot_password/$', views.ForgotPasswordView.as_view(), name="forgot_password"),
