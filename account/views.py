@@ -1,4 +1,4 @@
-from django.views.generic import ListView
+from django.views.generic import ListView, RedirectView
 from django.views.generic.edit import FormView, UpdateView, DeletionMixin, CreateView
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
@@ -8,7 +8,7 @@ from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 from django.core.mail import send_mail
-from account.models import MyUser, Expert
+from account.models import User, Expert
 from account.forms import LoginForm, ExpertForm, ModeratorForm, PasswordChangeForm, ForgotPasswordForm
 
 
@@ -30,6 +30,14 @@ class SendEmailMixin:
 
     def send(self):
         send_mail(self.email_subject, self.render_email(), self.from_email, self.get_receivers(), fail_silently=False)
+
+
+class IndexView(RedirectView):
+    def get(self, request, *args, **kwargs):
+        if request.user.is_authenticated():
+            return HttpResponseRedirect(reverse_lazy('account:cabinet'))
+        else:
+            return HttpResponseRedirect(reverse_lazy('account:login'))
 
 
 class LoginView(FormView):
@@ -60,7 +68,7 @@ class ForgotPasswordView(FormView, SendEmailMixin):
 
     def form_valid(self, form):
         self.object = form.get_user()
-        self.password = MyUser.objects.make_random_password(length=4)
+        self.password = User.objects.make_random_password(length=4)
         self.object.set_password(self.password)
         self.object.save()
 
@@ -77,12 +85,12 @@ class ForgotPasswordView(FormView, SendEmailMixin):
 
 
 class ShowProfileView(LoginRequiredMixin, FormView):
-    model = MyUser
+    model = User
     success_url = reverse_lazy("account:cabinet")
     template_name = 'account/profile/show_profile.html'
 
     def get_form(self, form_class=None):
-        if self.get_object().is_moderator:
+        if self.get_object().is_admin:
             form = ModeratorForm
         else:
             form = ExpertForm
@@ -100,7 +108,7 @@ class ShowProfileView(LoginRequiredMixin, FormView):
         return self.request.user
 
     def form_valid(self, form=None):
-        profile = MyUser.objects.filter(email=self.get_object().email)
+        profile = User.objects.filter(email=self.get_object().email)
         profile.update(**form.cleaned_data)
         messages.success(self.request, 'Информация изменена')
         return HttpResponseRedirect(self.success_url)
@@ -160,7 +168,7 @@ class CreateExpertView(PermissionRequiredMixin, SendEmailMixin, CreateView):
 
     def form_valid(self, form):
         self.object = form.save(commit=False)
-        self.password = MyUser.objects.make_random_password(length=4)
+        self.password = User.objects.make_random_password(length=4)
         self.object.set_password(self.password)
         self.object.save()
 
@@ -214,7 +222,7 @@ class ResetPasswordView(PermissionRequiredMixin, SendEmailMixin, UpdateView):
     password = None
 
     def get(self, request, *args, **kwargs):
-        self.password = MyUser.objects.make_random_password(length=4)
+        self.password = User.objects.make_random_password(length=4)
         expert = self.get_object()
         expert.set_password(self.password)
         expert.save()

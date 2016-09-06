@@ -16,7 +16,7 @@
                     </li>
                 </ul>
                 <ul class="nav nav-sidebar">
-                    {% if user.is_moderator %}
+                    {% if user.is_admin %}
                         {% include "account/base/_moderator_menu.html" %}
                     {% else %}
                         {% include "account/base/_expert_menu.html" %}

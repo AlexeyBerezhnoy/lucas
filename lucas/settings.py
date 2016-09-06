@@ -42,7 +42,7 @@ INSTALLED_APPS = (
     'assessment',
 )
 
-AUTH_USER_MODEL = 'account.MyUser'
+AUTH_USER_MODEL = 'account.User'
 
 LOGIN_URL = '/login/'
 

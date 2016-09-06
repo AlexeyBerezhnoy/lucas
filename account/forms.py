@@ -2,7 +2,7 @@ from django.contrib.auth import authenticate
 from django.core.exceptions import ValidationError
 from django import forms
 
-from account.models import Expert, MyUser
+from account.models import Expert, User
 
 
 class LoginForm(forms.Form):
@@ -68,8 +68,8 @@ class ForgotPasswordForm(forms.Form):
                              widget=forms.TextInput(attrs={"class": "form-control"}))
 
     def clean(self):
-        if not MyUser.objects.filter(**self.cleaned_data):
+        if not User.objects.filter(**self.cleaned_data):
             raise ValidationError('Заданный пользователь не найден')
 
     def get_user(self):
-        return MyUser.objects.get(**self.cleaned_data)
+        return User.objects.get(**self.cleaned_data)

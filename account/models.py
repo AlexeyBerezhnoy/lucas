@@ -5,36 +5,31 @@ from account.validator import validate_name, validate_profession, validate_exper
 CATEGORIES = ['A', 'A1', 'B', 'B1', 'BE', 'C', 'C1', 'CE', 'C1E', 'D', 'D1', 'DE', 'D1E', 'M', 'Tm', 'Tb']
 
 
-class MyUserManager(BaseUserManager):
+class ModeratorManager(BaseUserManager):
     def create_moderator(self, email, last_name, first_name, middle_name):
-        # TODO: Сделай email нормальным
-        user = self.model(email=email,
+        user = self.model(email=self.normalize_email(email),
                           last_name=last_name,
                           first_name=first_name,
                           middle_name=middle_name)
-        user.is_moderator = True
+        user.is_admin = True
+        user.save()
+        user.user_permissions.add(Permission.objects.get(codename='manipulate_expert'))
         user.save()
         return user
 
+
+class ExpertManager(BaseUserManager):
     def create_expert(self, email, last_name, first_name, middle_name,
                       profession, professional_experience, position,
                       driver_license, driving_experience):
         user = self.model(email=email, last_name=last_name, first_name=first_name, middle_name=middle_name,
                           profession=profession, professional_experience=professional_experience, position=position,
                           driver_license=driver_license, driving_experience=driving_experience)
-        user.is_expert = True
-        user.save()
-
-    def create_superuser(self, email, password):
-        user = self.model(email=self.normalize_email(email))
-        user.set_password(password)
-        user.is_active = True
-        user.is_admin = True
-        user.is_moderator = True
         user.save()
 
 
-class MyUser(AbstractBaseUser, PermissionsMixin):
+class User(AbstractBaseUser, PermissionsMixin):
+
     email = models.EmailField("email",
                               unique=True)
     last_name = models.CharField("фамилия",
@@ -67,51 +62,36 @@ class MyUser(AbstractBaseUser, PermissionsMixin):
                                              validators=[validate_experience])
 
     is_expert = models.BooleanField(default=False)
-    is_moderator = models.BooleanField(default=False)
-
     is_active = models.BooleanField(default=False)
     is_admin = models.BooleanField(default=False)
 
-    objects = MyUserManager()
-
     USERNAME_FIELD = 'email'
-    REQUIRED_FIELDS = []
 
-    def get_full_name(self):
-        # The user is identified by their email address
-        return self.email
-
-    def get_short_name(self):
-        # The user is identified by their email address
-        return self.email
+    objects = ModeratorManager()
 
     def __str__(self):
-        return "%s %s. %s." % (self.last_name, self.first_name[0], self.middle_name[0])
-
-    def has_module_perms(self, app_label):
-        return True
+        return self.email
 
     @property
     def is_staff(self):
         return self.is_admin
 
 
-class Moderator(MyUser):
-    objects = MyUserManager()
+class Moderator(User):
+    objects = ModeratorManager()
 
     class Meta:
         proxy = True
 
     def save(self, *args, **kwargs):
-        self.user_permissions.add(Permission.objects.get(codename='manipulate_expert'))
         super(Moderator, self).save(*args, **kwargs)
 
     def __str__(self):
         return self.email
 
 
-class Expert(MyUser):
-    objects = MyUserManager()
+class Expert(User):
+    objects = ExpertManager()
 
     def save(self, *args, **kwargs):
         """
