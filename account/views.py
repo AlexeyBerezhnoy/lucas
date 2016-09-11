@@ -150,10 +150,10 @@ class ExpertList(PermissionRequiredMixin, ListView):
     queryset = Expert.objects.filter(is_expert=True)
     template_name = "account/expert/index.html"
 
-    permission_required = ('account.manipulate_expert',)
+    permission_required = ('manipulate_expert',)
 
 
-class CreateExpertView(PermissionRequiredMixin, SendEmailMixin, CreateView):
+class CreateExpertView(SendEmailMixin, CreateView):
     model = Expert
     form_class = ExpertForm
     object = None
@@ -161,7 +161,7 @@ class CreateExpertView(PermissionRequiredMixin, SendEmailMixin, CreateView):
     template_name = 'account/expert/new.html'
     success_url = reverse_lazy('account:experts')
 
-    permission_required = ('account.manipulate_expert',)
+    permission_required = ('manipulate_expert',)
 
     email_subject = 'Добро пожаловать'
     email_template_name = 'account/email/invite_expert.html'
@@ -183,19 +183,21 @@ class CreateExpertView(PermissionRequiredMixin, SendEmailMixin, CreateView):
         return self.object.email,
 
 
-class ExpertView(PermissionRequiredMixin, DeletionMixin, UpdateView):
+class ExpertView(DeletionMixin, UpdateView):
     model = Expert
     form_class = ExpertForm
     template_name = 'account/expert/edit.html'
     success_url = reverse_lazy('account:experts')
-    permission_required = ('account.manipulate_expert',)
+
+    permission_required = ('manipulate_expert',)
 
 
-class ToggleActivityExpertView(PermissionRequiredMixin, UpdateView):
+class ToggleActivityExpertView(UpdateView):
     http_method_names = ['get']
     model = Expert
     success_url = reverse_lazy('account:experts')
-    permission_required = ('account.manipulate_expert',)
+
+    permission_required = ('manipulate_expert',)
 
     def get(self, request, *args, **kwargs):
         if self.object.is_active:
@@ -208,12 +210,12 @@ class ToggleActivityExpertView(PermissionRequiredMixin, UpdateView):
         HttpResponseRedirect(self.success_url)
 
 
-class ResetPasswordView(PermissionRequiredMixin, SendEmailMixin, UpdateView):
+class ResetPasswordView(SendEmailMixin, UpdateView):
     http_method_names = ['get']
     model = Expert
     success_url = reverse_lazy('account:experts')
 
-    permission_required = ('account.manipulate_expert',)
+    permission_required = ('manipulate_expert',)
 
     email_template_name = 'account/email/new_password.html'
     email_subject = 'Пароль обновлен'
@@ -231,7 +233,7 @@ class ResetPasswordView(PermissionRequiredMixin, SendEmailMixin, UpdateView):
         return HttpResponseRedirect(self.success_url)
 
     def get_email_context_data(self):
-        return {'user': self.object, 'password': self.password}
+        return {'user': self.get_object(), 'password': self.password}
 
     def get_receivers(self):
-        return self.object.email,
+        return self.get_object().email,

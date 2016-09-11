@@ -17,6 +17,9 @@ class ModeratorManager(BaseUserManager):
         user.save()
         return user
 
+    def get_queryset(self):
+        return super(BaseUserManager, self).get_queryset().filter(is_admin=True)
+
 
 class ExpertManager(BaseUserManager):
     def create_expert(self, email, last_name, first_name, middle_name,
@@ -26,6 +29,10 @@ class ExpertManager(BaseUserManager):
                           profession=profession, professional_experience=professional_experience, position=position,
                           driver_license=driver_license, driving_experience=driving_experience)
         user.save()
+        return user
+
+    def get_queryset(self):
+        return super(BaseUserManager, self).get_queryset().filter(is_expert=True)
 
 
 class User(AbstractBaseUser, PermissionsMixin):
@@ -67,14 +74,24 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     USERNAME_FIELD = 'email'
 
-    objects = ModeratorManager()
+    objects = BaseUserManager()
 
     def __str__(self):
         return self.email
 
-    @property
-    def is_staff(self):
-        return self.is_admin
+    # TODO: лучше использовать нормальную проверку пермишинов
+    def has_perm(self, perm, obj=None):
+        p = Permission.objects.get(codename=perm)
+
+        if p not in self.user_permissions.all():
+            return False
+        return True
+
+    def has_perms(self, perm_list, obj=None):
+        for perm in perm_list:
+            if not self.has_perm(perm):
+                return False
+        return True
 
 
 class Moderator(User):
@@ -82,9 +99,6 @@ class Moderator(User):
 
     class Meta:
         proxy = True
-
-    def save(self, *args, **kwargs):
-        super(Moderator, self).save(*args, **kwargs)
 
     def __str__(self):
         return self.email
