@@ -30,6 +30,7 @@
     {% endblock %}
     {% block content %}{% endblock %}
 </div>
+{% block js %}
 <!-- Bootstrap core JavaScript
 ================================================== -->
 <!-- Placed at the end of the document so the pages load faster -->
@@ -38,5 +39,6 @@
 <script src="{% static 'js/table.js' %}"></script>
 <script src="{% static 'js/activity.js' %}"></script>
 <script src="{% static 'js/bootstrap.min.js' %}"></script>
+{% endblock %}
 </body>
 </html>

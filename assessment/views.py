@@ -4,6 +4,7 @@ from django.views.generic.edit import DeletionMixin
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.urlresolvers import reverse_lazy
 from django.forms import formset_factory
+from django.http import JsonResponse
 from django.shortcuts import render
 from assessment.forms import QualityForm, AssessmentForm
 from assessment.models import Quality, Assessment, QUALITY_CATEGORY
@@ -48,7 +49,6 @@ class QualityList(ListView):
     template_name = 'assessment/qualities/index.html'
     context_object_name = 'qualities'
 
-
 class CreateQuality(CreateView):
     model = Quality
     form_class = QualityForm
@@ -69,3 +69,22 @@ class DeleteQuality(DeletionMixin, BaseDetailView):
 
     def get(self, request, *args, **kwargs):
         return self.delete(request, *args, **kwargs)
+
+
+def show_assessments(request):
+    if request.method == "GET":
+        return render(request, 'assessment/assessments/assessments.html', {"assessments": Assessment.objects.all()})
+    if request.method == "JSON":
+        # Todo: ут всё очень плохо
+        categories = [quality.quality for quality in Quality.objects.all()]
+        series = []
+
+        for expert in Expert.objects.all():
+            s = {'name': expert.__str__(),
+                 'data': [[a.point, categories.index(a.quality.quality)] for a in expert.assessment_set.all()]}
+            series.append(s)
+        result = {
+            "categories": categories,
+            "series": series
+        }
+        return JsonResponse(result, safe=False)
