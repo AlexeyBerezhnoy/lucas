@@ -2,24 +2,6 @@
 
 {% block title %}Эксперты{% endblock %}
 
-{#{% block sidebar %}#}
-{#    <ul class="nav nav-sidebar">#}
-{#        <li>#}
-{#            <a href={% url "account:cabinet" %}>Профиль</a>#}
-{#        </li>#}
-{#    </ul>#}
-{#    <ul class="nav nav-sidebar">#}
-{#        <li class="active">#}
-{#            <a href=#>Експерты</a>#}
-{#        </li>#}
-{#        <li>#}
-{#            <a href={% url "account:cabinet" %}>Качества</a>#}
-{#        </li>#}
-{#        <li>#}
-{#            <a href={% url "account:cabinet" %}>Оценки</a>#}
-{#        </li>#}
-{#    </ul>#}
-{#{% endblock %}#}
 {% block main %}
         <form action="{% url "account:invite_expert" %}">
             <button class="btn btn-md btn-success right-block">Пригласить</button>
@@ -36,7 +18,7 @@
                 </tr>
             </thead>
             <tbody>
-                {% for expert in experts %}
+                {% for expert in object_list %}
                     <tr onclick="window.location.href='{% url "account:expert" expert.id %}'; return false">
                         <td>{{ expert.id }}</td>
                         <td>{{ expert }}</td>

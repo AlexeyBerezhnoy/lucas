@@ -23,10 +23,12 @@ QUALITY_CATEGORY = (("VS", "Свойства зрительного анализ
 
 
 class Quality(models.Model):
-    quality = models.CharField(max_length=60)
-    category = models.CharField(max_length=60,
+    quality = models.CharField('Название',
+                               max_length=60)
+    category = models.CharField('Категория',
+                                max_length=60,
                                 choices=QUALITY_CATEGORY)
-    description = models.TextField()
+    description = models.TextField('Описание')
 
     def __str__(self):
         return self.quality

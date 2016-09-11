@@ -1,5 +1,4 @@
 {% extends "base.html" %}
-{# TODO: Возможно следует создать базовый шаблон #}
 {% block title %} Профиль {% endblock %}
 
 {% block loadstatic %}
@@ -12,14 +11,12 @@
         <div class="col-lg-2 col-sm-2 col-md-2 sidebar">
             {% block sidebar %}
                 <ul class="nav nav-sidebar">
-                    {# TODO: Сделать выделение активного пункта меня #}
-                    {#                        <li class="active">#}
                     <li>
                         <a class="info" href={% url "account:cabinet" %}>Профиль</a>
                     </li>
                 </ul>
                 <ul class="nav nav-sidebar">
-                    {% if user.is_moderator %}
+                    {% if user.is_admin %}
                         {% include "account/base/_moderator_menu.html" %}
                     {% else %}
                         {% include "account/base/_expert_menu.html" %}
@@ -27,7 +24,6 @@
                 </ul>
             {% endblock %}
         </div>
-        {#         Todo: поправь разметку колонок #}
         <div class="col-xs-10 col-xs-offset-2 col-lg-10 col-lg-offset-2 col-md-10 col-md-offset-2 col-sm-10 col-sm-offset-2  main">
             {% block main %}
             {% endblock %}

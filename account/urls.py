@@ -1,21 +1,26 @@
-from django.conf.urls import url
+from django.conf.urls import url, include
+from django.views.generic import RedirectView
 from . import views
 
 
 urlpatterns = [
-    url(r'^$', views.show_profile),
-    url(r'^confirm/(\w*@\w*\.\w*)/([1-9A-Z]{4})/$', views.confirm, name="confirm"),
-    url(r'^logout/$', views.my_login, name="logout"),
-    url(r'^login/$', views.my_login, name="login"),
-    url(r'^cabinet/$', views.show_profile, name="cabinet"),
-    url(r'^cabinet/experts/$', views.show_experts, name="experts"),
-    url(r'^cabinet/expert/(\d+)$', views.show_expert, name="expert"),
-    url(r'^cabinet/invite_expert/$', views.new_expert, name="invite_expert"),
-    url(r'^cabinet/edit_expert/(\d+)/$', views.edit_expert, name="edit_expert"),
-    url(r'^cabinet/del_expert/(\d+)/$', views.del_expert, name="del_expert"),
-    url(r'^cabinet/toggle_activity/(\d+)/$', views.toggle_activity, name="toggle_activity"),
-    url(r'^cabinet/edit_profile/$', views.edit_profile, name="edit_profile"),
-    url(r'^cabinet/change_password/$', views.change_password, name="change_password"),
-    url(r'^cabinet/reset_password/(\w*@\w*\.\w*)/$', views.reset_password, name="reset_password"),
-    url(r'^cabinet/forgot_password/$', views.forgot_password, name="forgot_password"),
+    url(r'^$', views.IndexView.as_view(), name='index'),
+    url(r'^logout/$', views.LoginView.as_view(), name="logout"),
+    url(r'^login/$', views.LoginView.as_view(), name="login"),
+    url(r'^forgot_password/$', views.ForgotPasswordView.as_view(), name="forgot_password"),
+
+    url(r'^cabinet/$', views.ShowProfileView.as_view(), name="cabinet"),
+    url(r'^cabinet/change_password/$', views.ChangePasswordView.as_view(), name="change_password"),
+
+    url(r'experts/', include([
+        url(r'^$', views.ExpertList.as_view(), name='experts'),
+        url(r'^new/$', views.CreateExpertView.as_view(), name="invite_expert"),
+    ])),
+
+    url(r'expert/(?P<pk>\d+)/$', views.ExpertView.as_view(), name='expert'),
+    url(r'expert/(?P<pk>\d+)/', include([
+        url(r'^$', views.ExpertView.as_view(), name='expert'),
+        url(r'toggle_activity/$', views.ToggleActivityExpertView.as_view(), name="toggle_activity"),
+        url(r'reset_password/$', views.ResetPasswordView.as_view(), name="reset_password")
+    ])),
 ]
