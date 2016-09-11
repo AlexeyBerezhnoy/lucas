@@ -1,17 +1,18 @@
 from django import forms
 from django.core.exceptions import ValidationError
-from assessment.models import QUALITY_CATEGORY, Quality
-from assessment.validator import validate_quality_id, validate_point
+from assessment.models import Quality
+from assessment.validator import validate_point
 
 
-class QualityForm(forms.Form):
-    quality = forms.CharField(label="Название",
-                              widget=forms.TextInput(attrs={"class": "form-control"}))
-    category = forms.ChoiceField(label="Категория",
-                                 choices=QUALITY_CATEGORY,
-                                 widget=forms.Select(attrs={"class": "form-control"}))
-    description = forms.CharField(label="Описание",
-                                  widget=forms.Textarea(attrs={"class": "form-control"}))
+class QualityForm(forms.ModelForm):
+    class Meta:
+        model = Quality
+        fields = ['quality', 'category', 'description']
+
+    def __init__(self, *args, **kwargs):
+        super(QualityForm, self).__init__(*args, **kwargs)
+        for field in self.fields:
+            self.fields[field].widget.attrs['class'] = 'form-control'
 
 
 class AssessmentForm(forms.Form):
