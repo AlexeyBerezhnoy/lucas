@@ -1,11 +1,10 @@
-from django.core.exceptions import ValidationError, ObjectDoesNotExist
 from django.core.management.base import BaseCommand
-from django.template.loader import render_to_string
+from django.core.exceptions import ValidationError, ObjectDoesNotExist
+from django.contrib.auth.password_validation import validate_password
 from django.core.validators import validate_email
 from account.validator import validate_name
+from getpass import getpass
 from account.models import Moderator
-from account.views import get_new_password
-from account.views import send_message
 
 
 class Command(BaseCommand):
@@ -55,17 +54,26 @@ class Command(BaseCommand):
             else:
                 break
 
+        while True:
+            self.stdout.write('Пароль:', ending=" ")
+            password = getpass()
+            try:
+                validate_password(password)
+            except ValidationError:
+                self.stderr.write("Невозможно использовать как пароль")
+            else:
+                break
+
+        while True:
+            self.stdout.write('Повторите пароль:', ending=" ")
+            confirm_password = getpass()
+            if confirm_password != password:
+                self.stderr.write("Неверное подтверждение пароля")
+            else:
+                break
+
         Moderator.objects.create_moderator(email=email,
                                            first_name=first_name,
                                            middle_name=middle_name,
-                                           last_name=last_name)
-
-        moderator = Moderator.objects.get(email=email)
-        password = get_new_password()
-        moderator.set_password(password)
-        moderator.save()
-
-        subject = "Добро пожаловать"
-        ctx = {'user': moderator, 'password': password}
-        message = render_to_string('account/email/invite_moderator.html', ctx)
-        send_message(moderator.email, subject, message)
+                                           last_name=last_name,
+                                           password=password)

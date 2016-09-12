@@ -6,7 +6,7 @@ CATEGORIES = ['A', 'A1', 'B', 'B1', 'BE', 'C', 'C1', 'CE', 'C1E', 'D', 'D1', 'DE
 
 
 class ModeratorManager(BaseUserManager):
-    def create_moderator(self, email, last_name, first_name, middle_name):
+    def create_moderator(self, email, last_name, first_name, middle_name, password):
         user = self.model(email=self.normalize_email(email),
                           last_name=last_name,
                           first_name=first_name,
@@ -14,6 +14,7 @@ class ModeratorManager(BaseUserManager):
         user.is_admin = True
         user.save()
         user.user_permissions.add(Permission.objects.get(codename='manipulate_expert'))
+        user.set_password(password)
         user.save()
         return user
 
