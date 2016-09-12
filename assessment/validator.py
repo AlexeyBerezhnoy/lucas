@@ -9,7 +9,7 @@ def validate_quality_id(value):
 
 
 def validate_point(value):
-    if not re.match(r'^([1-9])$', str(value)):
+    if not re.match(r'^([1-9]|10)$', str(value)):
         print(str(value))
         raise ValidationError("Поддерживаются только целые числа от 1 до 10")
     return 1
