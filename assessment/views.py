@@ -11,11 +11,11 @@ from assessment.models import Quality, Assessment, QUALITY_CATEGORY
 from account.models import Expert
 
 
-# TODO: это нужно пределать
+# TODO: это нужно переделать
 class RateQualities(TemplateView):
     form = formset_factory(AssessmentForm)
     model = Assessment
-    template_name = 'assessment/assessments/show_assessments.html'
+    template_name = 'assessment/quality/rate.html'
 
     def get_context_data(self, **kwargs):
         ctx = super(RateQualities, self).get_context_data(**kwargs)
@@ -41,25 +41,26 @@ class RateQualities(TemplateView):
                                                     quality=Quality.objects.get(id=quality_id),
                                                     defaults={"point": point})
 
-        return render(request, "assessment/assessments/show_assessments.html", self.get_context_data())
+        return render(request, "assessment/quality/rate.html", self.get_context_data())
 
 
 class QualityList(ListView):
     model = Quality
-    template_name = 'assessment/qualities/index.html'
+    template_name = 'assessment/quality/index.html'
     context_object_name = 'qualities'
+
 
 class CreateQuality(CreateView):
     model = Quality
     form_class = QualityForm
-    template_name = 'assessment/qualities/create.html'
+    template_name = 'assessment/quality/create.html'
     success_url = reverse_lazy('assessment:qualities')
 
 
 class EditQuality(UpdateView):
     model = Quality
     form_class = QualityForm
-    template_name = 'assessment/qualities/edit.html'
+    template_name = 'assessment/quality/edit.html'
     success_url = reverse_lazy('assessment:qualities')
 
 
@@ -71,11 +72,12 @@ class DeleteQuality(DeletionMixin, BaseDetailView):
         return self.delete(request, *args, **kwargs)
 
 
-def show_assessments(request):
-    if request.method == "GET":
-        return render(request, 'assessment/assessments/assessments.html', {"assessments": Assessment.objects.all()})
-    if request.method == "JSON":
-        # Todo: ут всё очень плохо
+class ShowAssessmentAsScatter(TemplateView):
+    template_name = 'assessment/assessment/scatter.html'
+    http_method_names = ('get', 'json')
+
+    def json(self, request, *args, **kwargs):
+        # Todo: тут всё очень плохо
         categories = [quality.quality for quality in Quality.objects.all()]
         series = []
 

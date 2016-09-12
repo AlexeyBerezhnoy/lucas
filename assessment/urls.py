@@ -11,4 +11,5 @@ urlpatterns = [
         url(r'^edit/$', views.EditQuality.as_view(), name="edit_quality"),
         url(r'^delete/$', views.DeleteQuality.as_view(), name="del_quality"),
     ])),
+    url(r'^assessments/$', views.ShowAssessmentAsScatter.as_view(), name='show_assessments'),
 ]

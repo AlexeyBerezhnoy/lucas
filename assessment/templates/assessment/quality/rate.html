@@ -6,17 +6,6 @@
     <link href="{% static 'assessment/css/style.css' %}" rel="stylesheet">
 {% endblock %}
 
-{#{% block main %}#}
-{#    {% for category in categories %}#}
-{#        <div class="row">#}
-{#            {{ category }}#}
-{#        </div>#}
-{#        {% if not forloop.last %}#}
-{#            <hr>#}
-{#        {% endif %}#}
-{#    {% endfor %}#}
-{#{% endblock %}#}
-
 {% block main %}
     <div id="collapse-group">
         <form action="{% url "assessment:edit_assessments" %}" method="post">
